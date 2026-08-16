@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>세포와 물질대사 · 사고훈련</title>
+<meta name="description" content="세포와 물질대사 사고훈련 — 전체 6단원 모음">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0B0E;
+    --card:#121319;
+    --card-hi:#171821;
+    --ink:#ECEDF1;
+    --muted:#888C97;
+    --muted2:#54575F;
+    --line:#1D1F26;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans KR', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .spectrum{
+    position:fixed; top:0; left:0; right:0; height:3px;
+    background:linear-gradient(90deg,#E0A64A,#E056A0,#F2703C,#E8C547,#E8804A,#F4C430);
+    z-index:10;
+  }
+  .wrap{
+    max-width:680px;
+    margin:0 auto;
+    padding:64px 20px 56px;
+  }
+  header{
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.72rem;
+    font-weight:600;
+    letter-spacing:0.06em;
+    color:var(--muted);
+    margin:0 0 14px;
+  }
+  h1{
+    font-size:clamp(1.9rem, 6vw, 2.5rem);
+    font-weight:700;
+    line-height:1.28;
+    letter-spacing:-0.01em;
+    margin:0 0 14px;
+    word-break:keep-all;
+  }
+  .lede{
+    font-size:0.98rem;
+    line-height:1.65;
+    color:var(--muted);
+    margin:0;
+    max-width:46ch;
+    word-break:keep-all;
+  }
+  .list{
+    display:flex;
+    flex-direction:column;
+    border-top:1px solid var(--line);
+  }
+  .row{
+    --u:#888;
+    --u-soft:rgba(136,136,136,0.12);
+    display:flex;
+    align-items:center;
+    gap:18px;
+    padding:20px 6px;
+    text-decoration:none;
+    color:inherit;
+    border-bottom:1px solid var(--line);
+    border-left:3px solid transparent;
+    background:transparent;
+    transition:background 0.2s ease, border-color 0.2s ease, padding-left 0.2s ease;
+    opacity:0;
+    animation:fadeUp 0.5s ease forwards;
+  }
+  .row:nth-of-type(1){animation-delay:0.05s;}
+  .row:nth-of-type(2){animation-delay:0.11s;}
+  .row:nth-of-type(3){animation-delay:0.17s;}
+  .row:nth-of-type(4){animation-delay:0.23s;}
+  .row:nth-of-type(5){animation-delay:0.29s;}
+  .row:nth-of-type(6){animation-delay:0.35s;}
+  .row:hover, .row:focus-visible{
+    background:linear-gradient(90deg, var(--u-soft), transparent 75%);
+    border-left-color:var(--u);
+    padding-left:16px;
+  }
+  .row:focus-visible{
+    outline:2px solid var(--u);
+    outline-offset:-2px;
+  }
+  .num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:1.05rem;
+    font-weight:600;
+    color:var(--muted2);
+    min-width:34px;
+    transition:color 0.2s ease;
+  }
+  .row:hover .num, .row:focus-visible .num{
+    color:var(--u);
+  }
+  .body{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+  }
+  .title{
+    font-size:1.06rem;
+    font-weight:600;
+    word-break:keep-all;
+  }
+  .desc{
+    font-size:0.84rem;
+    line-height:1.55;
+    color:var(--muted);
+    word-break:keep-all;
+  }
+  .meta{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.7rem;
+    color:var(--muted2);
+    letter-spacing:0.02em;
+  }
+  .go{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    flex-shrink:0;
+  }
+  .dot{
+    width:8px; height:8px; border-radius:50%;
+    background:var(--u);
+    flex-shrink:0;
+  }
+  .arrow{
+    font-size:1.1rem;
+    color:var(--muted2);
+    transition:transform 0.2s ease, color 0.2s ease;
+  }
+  .row:hover .arrow, .row:focus-visible .arrow{
+    transform:translateX(3px);
+    color:var(--u);
+  }
+  footer{
+    margin-top:36px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:0.78rem;
+    color:var(--muted2);
+    line-height:1.6;
+    word-break:keep-all;
+  }
+  @keyframes fadeUp{
+    from{opacity:0; transform:translateY(8px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  @media (max-width:520px){
+    .wrap{padding:48px 16px 40px;}
+    .row{gap:12px; padding:18px 4px;}
+    .desc{display:none;}
+    .num{min-width:28px; font-size:0.95rem;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .row{animation:none; opacity:1;}
+    .row, .num, .arrow{transition:none;}
+  }
+</style>
+</head>
+<body>
+<div class="spectrum"></div>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">사고훈련 시리즈</p>
+    <h1>세포와 물질대사</h1>
+    <p class="lede">세포를 이루는 물질부터 에너지를 얻고 만드는 과정까지, 여섯 단원을 순서대로 따라가며 사고훈련을 시작하세요.</p>
+  </header>
+
+  <nav class="list">
+    <a class="row" href="1단원_생물체의미시적기초_사고훈련.html" style="--u:#E0A64A;--u-soft:rgba(224,166,74,0.14)">
+      <span class="num">01</span>
+      <span class="body">
+        <span class="title">생명체의 미시적 기초</span>
+        <span class="desc">작은 분자들이 결합해 세포를 이루는 큰 물질이 되기까지, 그 구성과 특징을 익혀요.</span>
+        <span class="meta">주제 2개</span>
+      </span>
+      <span class="go"><span class="dot"></span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="2단원_세포의구조와기능_사고훈련.html" style="--u:#E056A0;--u-soft:rgba(224,86,160,0.14)">
+      <span class="num">02</span>
+      <span class="body">
+        <span class="title">세포의 구조와 기능</span>
+        <span class="desc">세포 안팎의 구조가 어떻게 맞물려 기능하는지, 그 관계를 익혀요.</span>
+        <span class="meta">주제 4개</span>
+      </span>
+      <span class="go"><span class="dot"></span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="3단원_물질대사_사고훈련.html" style="--u:#F2703C;--u-soft:rgba(242,112,60,0.14)">
+      <span class="num">03</span>
+      <span class="body">
+        <span class="title">물질대사</span>
+        <span class="desc">물질이 합성되고 분해되며 에너지가 오가는 흐름을 익혀요.</span>
+        <span class="meta">주제 2개</span>
+      </span>
+      <span class="go"><span class="dot"></span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="4단원_효소_사고훈련.html" style="--u:#E8C547;--u-soft:rgba(232,197,71,0.14)">
+      <span class="num">04</span>
+      <span class="body">
+        <span class="title">효소의 작용과 조절</span>
+        <span class="desc">효소가 반응 속도를 조절하는 원리를, 조건에 따른 변화와 함께 익혀요.</span>
+        <span class="meta">주제 2개</span>
+      </span>
+      <span class="go"><span class="dot"></span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="5단원_세포호흡_사고훈련.html" style="--u:#E8804A;--u-soft:rgba(232,128,74,0.14)">
+      <span class="num">05</span>
+      <span class="body">
+        <span class="title">세포호흡</span>
+        <span class="desc">유기물에 저장된 화학 에너지가 ATP로 바뀌는 과정을 단계별로 익혀요.</span>
+        <span class="meta">주제 4개</span>
+      </span>
+      <span class="go"><span class="dot"></span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="6단원_광합성_사고훈련.html" style="--u:#F4C430;--u-soft:rgba(244,196,48,0.14)">
+      <span class="num">06</span>
+      <span class="body">
+        <span class="title">광합성</span>
+        <span class="desc">빛에너지가 화학 에너지로 바뀌는 과정을 익혀요.</span>
+        <span class="meta">주제 4개</span>
+      </span>
+      <span class="go"><span class="dot"></span><span class="arrow">→</span></span>
+    </a>
+  </nav>
+
+  <footer>
+    각 단원의 학습 기록(정답률·통계)은 단원 파일마다 따로 저장돼요. 진행 상황을 이어가려면 매번 같은 기기·브라우저로 접속해 주세요.
+  </footer>
+</div>
+</body>
+</html>
