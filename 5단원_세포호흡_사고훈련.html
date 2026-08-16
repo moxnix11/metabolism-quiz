@@ -201,9 +201,63 @@
   .statcell{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 4px;text-align:center;}
   .statcell .n{font-family:'IBM Plex Mono',monospace;font-size:0.95rem;font-weight:600;color:var(--good);}
   .statcell .l{font-size:0.62rem;color:var(--muted);margin-top:3px;line-height:1.3;word-break:keep-all;padding:0 2px;}
+
+  .install-banner{
+    position:fixed; left:12px; right:12px; bottom:12px;
+    max-width:520px; margin:0 auto;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:12px 14px;
+    display:flex; align-items:center; gap:10px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.35);
+    z-index:50;
+    transition:transform 0.25s ease, opacity 0.25s ease;
+  }
+  .install-banner.hidden{
+    transform:translateY(140%);
+    opacity:0;
+    pointer-events:none;
+  }
+  .install-banner-text{
+    flex:1;
+    font-size:0.82rem;
+    color:var(--ink);
+    line-height:1.45;
+    word-break:keep-all;
+  }
+  .install-banner-btn{
+    background:var(--point);
+    color:var(--bg);
+    border:none;
+    border-radius:8px;
+    padding:8px 14px;
+    font-weight:700;
+    font-size:0.82rem;
+    cursor:pointer;
+    font-family:inherit;
+    flex-shrink:0;
+    white-space:nowrap;
+  }
+  .install-banner-dismiss{
+    background:none;
+    border:none;
+    color:var(--muted);
+    font-size:1rem;
+    cursor:pointer;
+    padding:4px;
+    flex-shrink:0;
+    line-height:1;
+  }
 </style>
 </head>
 <body>
+<div id="installBanner" class="install-banner hidden">
+  <span class="install-banner-text">📲 홈 화면에 추가하고 앱처럼 써보세요</span>
+  <button id="installBtn" class="install-banner-btn">설치</button>
+  <button id="installDismiss" class="install-banner-dismiss" aria-label="닫기">✕</button>
+</div>
+
 <div class="wrap">
   <h1>세포호흡 — 사고 훈련</h1>
   <p class="sub">유기물에 저장된 화학 에너지가 ATP로 바뀌는 과정을 단계별로 따라가며 익히는 연습이에요.</p>
@@ -940,6 +994,74 @@ function renderStats(){
 renderTabs();
 updateMuteBtn();
 renderStats();
+</script>
+<script>
+(function(){
+  var STORAGE_KEY = 'installDismissed_U5';
+  var banner = document.getElementById('installBanner');
+  var btn = document.getElementById('installBtn');
+  var dismissBtn = document.getElementById('installDismiss');
+  var textEl = banner ? banner.querySelector('.install-banner-text') : null;
+  var deferredPrompt = null;
+
+  function isStandalone(){
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+  function isIOS(){
+    return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+  }
+  function dismissed(){
+    return localStorage.getItem(STORAGE_KEY) === '1';
+  }
+  function showBanner(){
+    if(!banner || isStandalone() || dismissed()) return;
+    banner.classList.remove('hidden');
+  }
+  function hideBanner(){
+    if(banner) banner.classList.add('hidden');
+  }
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('./sw.js').catch(function(){});
+    });
+  }
+
+  if(!isStandalone()){
+    if(isIOS()){
+      if(textEl) textEl.textContent = 'Safari 하단 공유 버튼 → "홈 화면에 추가"로 앱처럼 설치할 수 있어요';
+      if(btn) btn.style.display = 'none';
+      showBanner();
+    } else {
+      window.addEventListener('beforeinstallprompt', function(e){
+        e.preventDefault();
+        deferredPrompt = e;
+        showBanner();
+      });
+      window.addEventListener('appinstalled', function(){
+        hideBanner();
+        localStorage.setItem(STORAGE_KEY, '1');
+      });
+    }
+  }
+
+  if(btn){
+    btn.onclick = function(){
+      if(!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.finally(function(){
+        deferredPrompt = null;
+        hideBanner();
+      });
+    };
+  }
+  if(dismissBtn){
+    dismissBtn.onclick = function(){
+      hideBanner();
+      localStorage.setItem(STORAGE_KEY, '1');
+    };
+  }
+})();
 </script>
 </body>
 </html>
