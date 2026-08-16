@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>효소의 작용과 조절 · 사고 훈련</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14121F;
+    --ink:#EDEAF5;
+    --muted:#A79BC4;
+    --good:#45D6A0;
+    --good-soft:rgba(69,214,160,0.14);
+    --accent:#B98FE8;
+    --accent-soft:rgba(185,143,232,0.14);
+    --bad:#E2555C;
+    --bad-soft:rgba(226,85,92,0.14);
+    --point:#E8C547;
+    --card:#211D33;
+    --border:#453D63;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans KR', sans-serif;
+    padding:48px 28px 60px;
+  }
+  .wrap{max-width:680px;margin:0 auto;}
+  h1{
+    font-family:'IBM Plex Sans KR', sans-serif;
+    font-weight:700;
+    font-size: clamp(1.3rem, 4vw, 1.7rem);
+    line-height:1.4;
+    word-break:keep-all;
+    margin:0 0 10px;
+    color:var(--ink);
+  }
+  .sub{color:var(--muted);font-size:1.05rem;margin:0 0 26px;line-height:1.55;word-break:keep-all;}
+
+  .tabs{display:flex;flex-direction:column;gap:10px;margin-bottom:22px;}
+  .tab{
+    flex:1 1 auto;
+    min-width:120px;
+    background:var(--card);
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:13px 15px;
+    cursor:pointer;
+    text-align:left;
+  }
+  .tab:hover{border-color:var(--good);}
+  .tab.active{border-color:var(--good);background:var(--good-soft);}
+  .tab .name{font-size:0.88rem;font-weight:600;word-break:keep-all;}
+
+  .hidden{display:none;}
+
+  .progress{display:flex;gap:6px;margin-bottom:14px;}
+  .pdot{width:22px;height:5px;border-radius:3px;background:var(--border);}
+  .pdot.done{background:var(--good);}
+  .pdot.current{background:var(--point);}
+
+  .specimen{
+    background:var(--card);
+    border:1.5px solid var(--border);
+    border-radius:14px;
+    padding:26px;
+    box-shadow:0 2px 0 var(--border);
+  }
+  .dirtag{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.68rem;
+    padding:3px 9px;
+    border-radius:20px;
+    margin-bottom:12px;
+    letter-spacing:0.03em;
+  }
+  .prompt-label{font-size:0.72rem;color:var(--accent);font-family:'IBM Plex Sans KR', sans-serif;font-weight:700;letter-spacing:0.02em;margin-bottom:6px;}
+  .prompt-text{font-size:1.05rem;line-height:1.6;margin:0 0 18px;word-break:keep-all;}
+  .prompt-text .target{color:var(--good);font-weight:700;}
+
+  .opt{
+    display:block;width:100%;text-align:left;
+    background:#2C2646;
+    border:1.3px solid var(--border);
+    color:var(--ink);
+    padding:14px 16px;
+    border-radius:9px;
+    margin-bottom:10px;
+    cursor:pointer;
+    font-size:0.93rem;
+    font-family:inherit;
+    word-break:keep-all;
+  }
+  .opt:hover:not(:disabled){border-color:var(--good);}
+  .opt.correct{border-color:var(--good);background:var(--good-soft);}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-soft);}
+  .opt{position:relative;overflow:visible;}
+  .fb-icon{
+    position:absolute;top:-9px;right:-9px;width:24px;height:24px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;
+    opacity:0;transform:scale(0.4);transition:opacity 0.16s ease,transform 0.16s ease;
+    pointer-events:none;box-shadow:0 2px 6px rgba(0,0,0,0.35);
+  }
+  .fb-icon.show{opacity:1;transform:scale(1);}
+  .fb-icon.ok{background:var(--good);color:#0B241C;}
+  .fb-icon.bad{background:var(--bad);color:#2A0C0E;}
+  .muteBtn{
+    background:none;border:1.3px solid var(--border);color:var(--muted);
+    width:40px;height:40px;min-width:40px;border-radius:50%;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:19px;
+    margin-left:8px;flex-shrink:0;
+  }
+  .muteBtn:hover{border-color:var(--point);color:var(--point);}
+  .opt:disabled{cursor:default;}
+
+  .feedback{
+    margin-top:8px;
+    padding:12px 14px;
+    border-radius:9px;
+    font-size:0.88rem;
+    line-height:1.55;
+    position:relative;
+    word-break:keep-all;
+  }
+  .feedback.ok{background:var(--good-soft);border:1px solid var(--good);color:#DFFCF0;}
+  .feedback.bad{background:var(--bad-soft);border:1px solid var(--bad);color:#FFE1E3;}
+
+  .navrow{display:flex;justify-content:flex-end;margin-top:16px;}
+  button.primary{
+    background:var(--good);color:#0B241C;border:none;
+    padding:10px 20px;border-radius:9px;font-weight:600;cursor:pointer;font-family:inherit;
+  }
+  button.primary:disabled{opacity:0.35;cursor:default;}
+  button.ghost{
+    background:none;border:1.3px solid var(--border);color:var(--muted);
+    padding:9px 16px;border-radius:9px;cursor:pointer;font-family:inherit;
+  }
+  .back{background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.85rem;margin-bottom:12px;font-family:inherit;padding:0;}
+  .back:hover{color:var(--good);}
+
+  .sumrow{display:flex;justify-content:space-between;align-items:center;padding:9px 4px;border-bottom:1px dashed var(--border);font-size:0.9rem;}
+  .sumrow:last-child{border-bottom:none;}
+  .mark{font-family:'IBM Plex Sans KR', sans-serif;font-weight:700;font-size:0.82rem;}
+  .mark.ok{color:var(--good);}
+  .mark.bad{color:var(--bad);}
+
+  .diffgaugebox{margin-top:10px;padding:6px 4px;}
+  .diffvalue{
+    font-family:'IBM Plex Mono',monospace;font-size:2.2rem;font-weight:700;
+    text-align:center;color:var(--point);margin-bottom:10px;transition:color .2s;
+  }
+  input[type=range]{
+    -webkit-appearance:none; appearance:none;
+    width:100%;height:8px;border-radius:5px;outline:none;cursor:pointer;
+    background:var(--border);
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;
+    width:24px;height:24px;border-radius:50%;
+    background:var(--ink);border:3px solid var(--point);
+    cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.4);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:24px;height:24px;border-radius:50%;
+    background:var(--ink);border:3px solid var(--point);
+    cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.4);
+  }
+  input[type=range]::-moz-range-track{height:8px;border-radius:5px;background:var(--border);}
+  .diffscale{display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);margin-top:6px;}
+  .difflabel{text-align:center;font-size:0.85rem;font-weight:700;color:var(--muted);margin-top:10px;}
+
+  .timerRow{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .timerBarTrack{flex:1;height:8px;border-radius:5px;background:var(--card);border:1px solid var(--border);overflow:hidden;}
+  .timerBarFill{height:100%;width:100%;background:var(--good);transition:width 1s linear, background-color .3s;}
+  .timerNum{font-family:'IBM Plex Mono',monospace;font-size:0.85rem;font-weight:600;color:var(--ink);min-width:34px;text-align:right;}
+
+  .statsbar{margin-top:30px;padding-top:16px;border-top:1px solid var(--border);}
+  .statsHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;}
+  .statsHeader h4{margin:0;}
+  .resetLink{
+    background:none;border:1px solid var(--border);color:var(--muted);
+    font-family:'IBM Plex Sans KR', sans-serif;font-size:0.72rem;
+    padding:4px 10px;border-radius:20px;cursor:pointer;flex-shrink:0;
+  }
+  .resetLink:hover{border-color:var(--bad);color:var(--bad);}
+  .statsbar h4{font-size:0.78rem;color:var(--muted);font-family:'IBM Plex Sans KR', sans-serif;font-weight:700;letter-spacing:0.02em;margin:0;}
+  .statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+  @media(max-width:520px){ .statgrid{grid-template-columns:repeat(2,1fr);} .tabs{flex-direction:column;} .tab{min-width:0;} }
+  .statcell{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 4px;text-align:center;}
+  .statcell .n{font-family:'IBM Plex Mono',monospace;font-size:0.95rem;font-weight:600;color:var(--good);}
+  .statcell .l{font-size:0.62rem;color:var(--muted);margin-top:3px;line-height:1.3;word-break:keep-all;padding:0 2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>효소의 작용과 조절 — 사고 훈련</h1>
+  <p class="sub">효소가 반응 속도를 조절하는 원리를, 조건에 따라 달라지는 활성과 함께 단계별로 따라가며 익히는 연습이에요.</p>
+
+  <div class="tabs" id="tabBar"></div>
+
+  <div id="difficultyScreen" class="hidden">
+    <button class="back" onclick="goHome()">&larr; 주제 목록으로</button>
+    <div class="specimen">
+      <div class="prompt-label" id="diffTitle"></div>
+      <p class="prompt-text">한 문제당 제한 시간을 골라주세요. 시간이 다 되면 자동으로 오답 처리돼요.</p>
+      <div class="diffgaugebox">
+        <div class="diffvalue" id="diffValue">15초</div>
+        <input type="range" id="diffSlider" min="5" max="30" step="1" value="15" oninput="updateDiffDisplay()">
+        <div class="diffscale"><span>5초 (빠름)</span><span>30초 (여유)</span></div>
+        <div class="difflabel" id="diffLabel">보통 속도</div>
+        <button class="primary" style="margin-top:16px;width:100%;" onclick="confirmDifficulty()">이 시간으로 시작하기</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="itemScreen" class="hidden">
+    <button class="back" onclick="goHome()">&larr; 주제 목록으로</button>
+    <div class="progress" id="progress"></div>
+    <div class="timerRow">
+      <div class="timerBarTrack"><div class="timerBarFill" id="timerBarFill"></div></div>
+      <span class="timerNum" id="timerNum">--</span>
+      <button class="muteBtn" id="muteBtn" onclick="toggleMute()" aria-label="소리 켜기/끄기" type="button">🔊</button>
+    </div>
+    <div class="specimen">
+      <div class="prompt-label" id="promptLabel"></div>
+      <p class="prompt-text" id="promptText"></p>
+      <div id="opts"></div>
+      <div id="fbBox"></div>
+      <div class="navrow">
+        <button class="primary" id="nextBtn" disabled onclick="nextItem()">다음 →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="summaryScreen" class="hidden">
+    <button class="back" onclick="goHome()">&larr; 주제 목록으로</button>
+    <div class="specimen">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--point);margin-bottom:8px;">RESULT</div>
+      <div id="sumTitle" style="font-size:1.05rem;font-weight:700;margin-bottom:10px;"></div>
+      <div id="sumRows"></div>
+      <div class="navrow" style="justify-content:space-between;">
+        <button class="ghost" onclick="openDifficultyScreen(curFwId)">다시 풀기</button>
+        <button class="primary" onclick="goHome()">다른 주제 풀기</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="statsbar">
+    <div class="statsHeader">
+      <h4>학습 현황 · 주제별 한 번에 맞힌 문제 비율</h4>
+      <button class="resetLink" onclick="resetStats()">기록 초기화</button>
+    </div>
+    <div class="statgrid" id="statGrid"></div>
+  </div>
+</div>
+
+<script>
+const frameworks = [
+{
+  id:'A', code:'[12세포02-03·12세포02-04]', name:'효소의 작용',
+  items:[
+    {dir:'fwd', prompt:'어떤 반응에 효소를 넣었더니 반응이 일어나는 데 필요한 최소한의 에너지 크기가 크게 줄었지만, 반응물과 생성물이 가진 에너지양의 차이는 그대로였다. 이때 줄어든 값에 해당하는 것은?',
+     opts:[
+       {t:'활성화에너지', c:true, f:'효소는 반응열은 그대로 둔 채 활성화에너지만 낮추어 반응 속도를 높입니다.'},
+       {t:'반응열', c:false, f:'반응열은 효소의 유무와 관계없이 일정하게 유지된다고 했으므로, 줄어든 값은 반응열이 아니라 활성화에너지입니다.'},
+       {t:'재사용성', c:false, f:'재사용성은 효소가 반복해서 쓰일 수 있는 성질인데, 이 설명은 에너지 값의 변화에 대한 것이므로 활성화에너지입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">활성화에너지</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'화학 반응이 일어나기 위해 반응물이 넘어야 하는 에너지 장벽의 크기로, 효소가 있으면 낮아진다', c:true, f:'효소에 의해 낮아지는 에너지 장벽의 크기는 활성화에너지입니다.'},
+       {t:'반응물과 생성물의 에너지양 차이로, 효소의 유무와 관계없이 일정하다', c:false, f:'이건 반응열에 대한 설명입니다.'},
+       {t:'기질이 효소의 활성부위에 결합해 만들어지는 일시적인 결합 상태이다', c:false, f:'이건 효소-기질복합체에 대한 설명입니다.'},
+       {t:'효소가 특정 구조에 맞는 기질하고만 결합해 작용하는 성질이다', c:false, f:'이건 기질특이성에 대한 설명입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">활성화에너지</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'온도를 높이지 않고 효소만 넣어도 반응이 빨라지는 원인이 되는 값으로, 효소가 있으면 이 값 자체가 낮아진다', c:true, f:'효소가 있을 때 낮아지는 에너지 장벽의 크기가 활성화에너지입니다.'},
+       {t:'반응이 진행되는 동안 방출되거나 흡수되는 열의 총량으로, 효소를 넣어도 변하지 않는다', c:false, f:'이건 반응열에 대한 설명입니다.'},
+       {t:'기질과 효소가 결합해 만들어지는 일시적 상태 자체를 가리킨다', c:false, f:'이건 효소-기질복합체에 대한 설명입니다.'},
+       {t:'효소가 정해진 기질하고만 결합하는 성질을 가리킨다', c:false, f:'이건 기질특이성에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'반응물이 가진 전체 에너지양과 생성물이 가진 전체 에너지양의 차이에 해당하는 값으로, 효소가 있든 없든 크기가 달라지지 않는다.',
+     opts:[
+       {t:'반응열', c:true, f:'반응물과 생성물의 에너지양 차이이며 효소의 유무와 무관하게 일정한 값은 반응열입니다.'},
+       {t:'활성화에너지', c:false, f:'활성화에너지는 효소가 있으면 낮아지는 값인데, 이 설명은 효소 유무와 무관하게 일정한 값이므로 반응열입니다.'},
+       {t:'효소-기질복합체', c:false, f:'효소-기질복합체는 효소와 기질이 결합한 상태를 가리키는데, 이 설명은 에너지양의 차이라는 수치에 대한 것이므로 반응열입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">반응열</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'반응물이 가진 에너지양과 생성물이 가진 에너지양의 차이로, 효소의 유무에 따라 크기가 달라지지 않는다', c:true, f:'효소의 유무와 무관하게 일정한 에너지양의 차이는 반응열입니다.'},
+       {t:'반응이 일어나는 데 필요한 최소한의 에너지 장벽으로, 효소가 있으면 낮아진다', c:false, f:'이건 활성화에너지에 대한 설명입니다.'},
+       {t:'효소가 반응 전후 구조가 변하지 않아 반복해서 쓰일 수 있는 성질이다', c:false, f:'이건 재사용성에 대한 설명입니다.'},
+       {t:'기질이 효소의 활성부위에 결합한 뒤 화학 결합에 변화가 일어나는 상태이다', c:false, f:'이건 효소-기질복합체에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'기질이 효소의 활성부위에 결합하여 만들어지는 일시적인 결합 상태로, 이 상태가 만들어지면 반응의 활성화에너지가 낮아진다.',
+     opts:[
+       {t:'효소-기질복합체', c:true, f:'기질이 효소의 활성부위에 결합해 만들어지는 일시적 결합 상태는 효소-기질복합체이며, 이 상태에서 활성화에너지가 낮아집니다.'},
+       {t:'기질특이성', c:false, f:'기질특이성은 효소가 특정 기질하고만 결합하는 성질 자체를 가리키는데, 이 설명은 결합해서 만들어진 상태 자체에 대한 것이므로 효소-기질복합체입니다.'},
+       {t:'반응열', c:false, f:'반응열은 에너지양의 차이인데, 이 설명은 효소와 기질이 결합한 상태에 대한 것이므로 효소-기질복합체입니다.'}
+     ]},
+    {dir:'fwd', prompt:'반응이 끝나 생성물이 만들어지면 이 결합 상태는 풀리고, 효소와 생성물이 서로 분리된다.',
+     opts:[
+       {t:'효소-기질복합체', c:true, f:'반응이 끝나면 풀리면서 효소와 생성물이 분리되는 결합 상태는 효소-기질복합체입니다.'},
+       {t:'재사용성', c:false, f:'재사용성은 분리된 효소가 다시 쓰일 수 있는 성질을 가리키는데, 이 설명은 분리되기 전 결합 상태 자체에 대한 것이므로 효소-기질복합체입니다.'},
+       {t:'활성화에너지', c:false, f:'활성화에너지는 반응에 필요한 에너지 크기인데, 이 설명은 결합 상태가 풀리는 과정에 대한 것이므로 효소-기질복합체입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">효소-기질복합체</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'효소의 활성부위와 기질이 결합해 잠깐 동안 유지되는 상태이며, 이 상태에서는 반응에 필요한 활성화에너지가 낮아져 있다', c:true, f:'기질과 효소가 결합해 만들어지는 일시적 상태는 효소-기질복합체입니다.'},
+       {t:'효소가 특정 입체 구조에 맞는 기질하고만 결합하는 성질이다', c:false, f:'이건 기질특이성에 대한 설명입니다.'},
+       {t:'반응물과 생성물의 에너지양 차이로, 효소의 유무와 무관하게 일정하다', c:false, f:'이건 반응열에 대한 설명입니다.'},
+       {t:'효소가 반응 전후 구조와 성질이 변하지 않아 다시 쓰일 수 있는 성질이다', c:false, f:'이건 재사용성에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'어떤 효소는 특정 구조를 가진 이당류하고만 결합해 분해하고, 구조가 비슷한 다른 이당류에는 전혀 작용하지 않았다. 이런 현상이 나타나는 까닭이 되는 효소의 성질은?',
+     opts:[
+       {t:'기질특이성', c:true, f:'활성부위 구조에 맞는 특정 물질하고만 결합하는 기질특이성 때문에 구조가 비슷해도 다른 물질에는 작용하지 않습니다.'},
+       {t:'반응열', c:false, f:'반응열은 에너지양의 차이인데, 이 설명은 결합 대상이 제한되는 현상에 대한 것이므로 기질특이성입니다.'},
+       {t:'재사용성', c:false, f:'재사용성은 효소가 반복 사용되는 성질인데, 이 설명은 특정 물질하고만 결합하는 성질이므로 기질특이성입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">기질특이성</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'효소마다 활성부위의 입체 구조가 달라, 그 구조에 맞는 특정 기질하고만 결합해 작용하는 성질이다', c:true, f:'활성부위 구조에 맞는 특정 기질하고만 결합하는 성질은 기질특이성입니다.'},
+       {t:'효소가 반응 전후 구조가 변하지 않아 새로운 기질과 다시 결합할 수 있는 성질이다', c:false, f:'이건 재사용성에 대한 설명입니다.'},
+       {t:'기질이 활성부위에 결합해 만들어지는 일시적인 결합 상태이다', c:false, f:'이건 효소-기질복합체에 대한 설명입니다.'},
+       {t:'반응이 일어나는 데 필요한 최소한의 에너지로, 효소가 있으면 낮아진다', c:false, f:'이건 활성화에너지에 대한 설명입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">기질특이성</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'구조가 비슷한 다른 물질이 있어도, 효소는 활성부위에 꼭 들어맞는 기질하고만 결합해 반응을 진행시킨다', c:true, f:'활성부위에 들어맞는 특정 기질하고만 결합하는 성질이 기질특이성입니다.'},
+       {t:'결합과 분리를 반복하며 여러 번 반응에 참여할 수 있는 성질이다', c:false, f:'이건 재사용성에 대한 설명입니다.'},
+       {t:'기질이 활성부위에 결합해 만들어지는 일시적 결합 상태이다', c:false, f:'이건 효소-기질복합체에 대한 설명입니다.'},
+       {t:'반응이 일어나기 위해 넘어야 하는 최소한의 에너지 장벽이다', c:false, f:'이건 활성화에너지에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'효소는 반응 전후에 구조와 성질이 변하지 않기 때문에, 한 번 반응에 참여한 뒤에도 생성물과 분리되어 새로운 기질과 다시 결합해 반응을 계속 촉매할 수 있다.',
+     opts:[
+       {t:'재사용성', c:true, f:'반응 전후 구조와 성질이 변하지 않아 반복적으로 반응에 참여할 수 있는 성질은 효소의 재사용성입니다.'},
+       {t:'기질특이성', c:false, f:'기질특이성은 결합 대상이 제한되는 성질인데, 이 설명은 반복해서 쓰일 수 있다는 성질이므로 재사용성입니다.'},
+       {t:'효소-기질복합체', c:false, f:'효소-기질복합체는 결합 상태 자체를 가리키는데, 이 설명은 분리된 뒤 다시 쓰이는 성질이므로 재사용성입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 효소의 <span class="target">재사용성</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'효소는 반응 전후 구조와 성질이 변하지 않아, 생성물과 분리된 뒤 새로운 기질과 결합해 반응을 반복해서 촉매할 수 있다', c:true, f:'구조와 성질이 변하지 않아 반복적으로 반응에 참여할 수 있는 성질이 재사용성입니다.'},
+       {t:'효소가 특정 입체 구조에 맞는 기질하고만 결합하는 성질이다', c:false, f:'이건 기질특이성에 대한 설명입니다.'},
+       {t:'반응물과 생성물의 에너지양 차이로, 효소의 유무와 무관하게 일정하다', c:false, f:'이건 반응열에 대한 설명입니다.'},
+       {t:'기질이 활성부위에 결합해 화학 결합에 변화가 일어나기 시작하는 상태이다', c:false, f:'이건 효소-기질복합체에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'전효소를 이루는 두 부분 중 단백질로 이루어진 부분으로, 보조인자보다 크기가 크며 열이나 pH 변화에 의해 비교적 쉽게 구조가 변성된다.',
+     opts:[
+       {t:'주효소', c:true, f:'전효소의 단백질 부분으로 열·pH에 의해 쉽게 변성되는 것은 주효소입니다.'},
+       {t:'조효소', c:false, f:'조효소는 비단백질 성분으로 열·pH의 영향을 적게 받는데, 이 설명은 단백질 부분이므로 주효소입니다.'},
+       {t:'가수분해효소', c:false, f:'가수분해효소는 물을 이용해 기질을 분해하는 효소 무리인데, 이 설명은 전효소를 이루는 단백질 부분에 대한 것이므로 주효소입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">주효소</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'보조인자보다 부피가 크며, 아미노산이 연결된 단백질로 이루어져 열이나 pH 변화에 비교적 쉽게 변성되는 전효소의 구성 성분이다', c:true, f:'보조인자보다 크며 단백질로 이루어져 열·pH에 취약한 전효소 구성 성분은 주효소입니다.'},
+       {t:'효소의 활성부위에 일시적으로 결합했다가 반응이 끝나면 떨어져 나가는 비단백질 성분의 유기물이다', c:false, f:'이건 조효소에 대한 설명입니다.'},
+       {t:'효소의 활성부위에 영구적으로 결합한 채 반응이 끝나도 분리되지 않는 비단백질 성분이다', c:false, f:'이건 금속이온에 대한 설명입니다.'},
+       {t:'물 분자를 첨가해 기질을 분해하는 반응을 촉매하는 효소 무리이다', c:false, f:'이건 가수분해효소에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'보조인자 중에서 일반적으로 효소의 활성부위에 일시적으로 결합했다가 반응이 끝나면 주효소로부터 떨어져 나가는, 비단백질 성분의 유기물이다.',
+     opts:[
+       {t:'조효소', c:true, f:'활성부위에 일시적으로 결합했다가 반응 후 분리되는 비단백질 유기물 보조인자는 조효소입니다.'},
+       {t:'금속이온', c:false, f:'금속이온은 활성부위에 영구적으로 결합해 분리되지 않는데, 이 설명은 반응 후 분리되는 것이므로 조효소입니다.'},
+       {t:'주효소', c:false, f:'주효소는 단백질 부분인데, 이 설명은 비단백질 성분의 보조인자이므로 조효소입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">조효소</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'주효소와 잠깐 결합했다가 반응이 마무리되면 다시 분리되어 나가는, 단백질이 아닌 유기물 형태의 보조인자이다', c:true, f:'주효소와 일시적으로 결합했다가 반응 후 분리되는 비단백질 유기물 보조인자는 조효소입니다.'},
+       {t:'효소의 활성부위에 영구적으로 결합한 채 반응이 끝나도 분리되지 않는 비단백질 성분이다', c:false, f:'이건 금속이온에 대한 설명입니다.'},
+       {t:'전효소를 이루는 단백질 부분으로, 열이나 pH에 의해 쉽게 변성된다', c:false, f:'이건 주효소에 대한 설명입니다.'},
+       {t:'물을 이용해 고분자 물질을 저분자로 분해하는 반응을 촉매한다', c:false, f:'이건 가수분해효소에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'보조인자 중에서 일반적으로 효소의 활성부위에 영구적으로 결합한 채 반응이 끝나도 주효소로부터 분리되지 않는, 비단백질 성분이다.',
+     opts:[
+       {t:'금속이온', c:true, f:'활성부위에 영구적으로 결합한 채 분리되지 않는 보조인자는 금속이온입니다.'},
+       {t:'조효소', c:false, f:'조효소는 반응이 끝나면 주효소로부터 떨어져 나가는데, 이 설명은 영구적으로 결합해 있는 것이므로 금속이온입니다.'},
+       {t:'전이효소', c:false, f:'전이효소는 작용기를 옮기는 반응을 촉매하는 효소 무리인데, 이 설명은 전효소를 구성하는 보조인자에 대한 것이므로 금속이온입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">금속이온</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'반응이 끝난 뒤에도 주효소에서 떨어지지 않고 활성부위에 계속 붙어 있는, 단백질이 아닌 형태의 보조인자이다', c:true, f:'반응 후에도 주효소로부터 분리되지 않고 활성부위에 남아 있는 비단백질 보조인자는 금속이온입니다.'},
+       {t:'효소의 활성부위에 일시적으로 결합했다가 반응이 끝나면 떨어져 나가는 유기물이다', c:false, f:'이건 조효소에 대한 설명입니다.'},
+       {t:'전효소를 이루는 두 부분 중 단백질로 이루어진 부분이다', c:false, f:'이건 주효소에 대한 설명입니다.'},
+       {t:'수소나 전자를 다른 분자에 전달하는 반응을 촉매한다', c:false, f:'이건 산화환원효소에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'기질에서 수소나 전자를 떼어 다른 분자에 전달하는 반응을 촉매하는 효소 무리로, 세포호흡 과정에서 물질을 산화시키는 여러 반응에 관여한다.',
+     opts:[
+       {t:'산화환원효소', c:true, f:'수소나 전자를 다른 분자에 전달하는 반응을 촉매하는 것은 산화환원효소입니다.'},
+       {t:'전이효소', c:false, f:'전이효소는 작용기를 떼어 다른 분자로 옮기는 반응을 촉매하는데, 이 설명은 수소·전자를 전달하는 반응이므로 산화환원효소입니다.'},
+       {t:'가수분해효소', c:false, f:'가수분해효소는 물 분자를 첨가해 기질을 분해하는데, 이 설명은 수소·전자 전달 반응이므로 산화환원효소입니다.'}
+     ]},
+
+    {dir:'rev', label:'다음 중 <span class="target">전이효소</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'한 분자의 특정 작용기를 통째로 떼어내 다른 분자로 옮겨 붙이는 반응을 촉매한다', c:true, f:'작용기를 떼어 다른 분자로 옮겨 붙이는 반응을 촉매하는 것은 전이효소입니다.'},
+       {t:'물 분자를 첨가하여 큰 분자를 작은 분자로 분해하는 반응을 촉매한다', c:false, f:'이건 가수분해효소에 대한 설명입니다.'},
+       {t:'기질에서 수소나 전자를 떼어 다른 분자에 전달하는 반응을 촉매한다', c:false, f:'이건 산화환원효소에 대한 설명입니다.'},
+       {t:'기질의 원자 배열을 바꾸어 이성질체로 전환하는 반응을 촉매한다', c:false, f:'이건 이성질화효소에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'물 분자를 기질에 첨가하여 큰 분자를 작은 분자로 분해하는 반응을 촉매하며, 지방을 지방산과 글리세롤로 분해하는 효소도 여기에 속한다.',
+     opts:[
+       {t:'가수분해효소', c:true, f:'물 분자를 첨가해 기질을 분해하는 반응을 촉매하는 것은 가수분해효소입니다.'},
+       {t:'산화환원효소', c:false, f:'산화환원효소는 수소·전자를 전달하는데, 이 설명은 물을 이용해 분해하는 반응이므로 가수분해효소입니다.'},
+       {t:'이성질화효소', c:false, f:'이성질화효소는 원자 배열만 바꾸는데, 이 설명은 물을 첨가해 분해하는 반응이므로 가수분해효소입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">가수분해효소</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'물을 이용해 큰 분자를 작은 분자로 쪼개는 반응을 촉매하는 효소 무리이며, 우리 몸의 소화효소 대부분이 이 무리에 해당한다', c:true, f:'물을 첨가해 분해하는 반응을 촉매하는 것은 가수분해효소이며, 소화효소 대부분이 여기 속합니다.'},
+       {t:'ATP 분해 에너지를 이용해 두 분자를 하나로 연결하는 반응을 촉매한다', c:false, f:'이건 연결효소에 대한 설명입니다.'},
+       {t:'기질의 원자 배열을 바꾸어 이성질체로 전환하는 반응을 촉매한다', c:false, f:'이건 이성질화효소에 대한 설명입니다.'},
+       {t:'기질에서 작용기를 떼어 다른 분자로 옮겨 붙이는 반응을 촉매한다', c:false, f:'이건 전이효소에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'산화나 가수분해가 아닌 방식으로 기질에서 작용기를 떼어내거나 첨가하는 반응을 촉매하며, 이 과정에서 새로운 이중결합이 만들어지기도 한다.',
+     opts:[
+       {t:'제거효소', c:true, f:'산화·가수분해 외의 방식으로 작용기를 제거·첨가하며 이중결합을 만드는 반응을 촉매하는 것은 제거효소입니다.'},
+       {t:'산화환원효소', c:false, f:'산화환원효소는 수소·전자를 전달하는 반응을 촉매하는데, 이 설명은 산화·가수분해가 아닌 방식이라고 했으므로 제거효소입니다.'},
+       {t:'이성질화효소', c:false, f:'이성질화효소는 원자 배열만 바꾸어 이성질체로 만드는데, 이 설명은 작용기를 제거·첨가하는 반응이므로 제거효소입니다.'}
+     ]},
+
+    {dir:'rev', label:'다음 중 <span class="target">이성질화효소</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'기질을 이루는 원자의 배열이나 입체 구조만 바꾸어, 분자식은 같지만 성질이 다른 물질로 전환하는 반응을 촉매한다', c:true, f:'원자 배열을 바꾸어 이성질체로 전환하는 반응을 촉매하는 것은 이성질화효소입니다.'},
+       {t:'기질에서 작용기를 떼어 다른 분자로 옮겨 붙이는 반응을 촉매한다', c:false, f:'이건 전이효소에 대한 설명입니다.'},
+       {t:'에너지를 사용하여 서로 다른 두 분자를 하나로 연결하는 반응을 촉매한다', c:false, f:'이건 연결효소에 대한 설명입니다.'},
+       {t:'산화나 가수분해가 아닌 방식으로 작용기를 제거하거나 첨가하는 반응을 촉매한다', c:false, f:'이건 제거효소에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'ATP를 분해할 때 나오는 에너지를 이용하여 서로 다른 두 분자(또는 두 부분)를 하나로 연결하는 반응을 촉매하는 효소 무리이다.',
+     opts:[
+       {t:'연결효소', c:true, f:'ATP의 에너지를 이용해 두 분자를 연결하는 반응을 촉매하는 것은 연결효소입니다.'},
+       {t:'가수분해효소', c:false, f:'가수분해효소는 물을 이용해 분자를 분해하는데, 이 설명은 에너지를 이용해 분자를 연결하는 반응이므로 연결효소입니다.'},
+       {t:'제거효소', c:false, f:'제거효소는 작용기를 제거·첨가하는데, 이 설명은 두 분자를 연결하는 반응이므로 연결효소입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'이 방식으로 반응 속도가 빨라질 때는 반응물 입자의 운동이나 수는 그대로인 채, 반응이 일어나는 데 필요한 에너지 장벽 자체가 낮아진다.',
+     opts:[
+       {t:'효소에 의한 반응 속도 증가', c:true, f:'입자의 운동이나 수는 바꾸지 않고 에너지 장벽 자체를 낮추는 방식은 효소에 의한 반응 속도 증가입니다.'},
+       {t:'온도 상승에 의한 반응 속도 증가', c:false, f:'온도 상승은 분자 운동을 활발하게 만드는 방식인데, 이 설명은 에너지 장벽 자체가 낮아지는 것이므로 효소에 의한 반응 속도 증가입니다.'},
+       {t:'기질·효소농도 증가에 의한 반응 속도 증가', c:false, f:'농도 증가는 입자 수 자체를 늘리는 방식인데, 이 설명은 에너지 장벽이 낮아지는 것이므로 효소에 의한 반응 속도 증가입니다.'}
+     ]},
+    {dir:'fwd', prompt:'온도와 반응물의 농도를 모두 일정하게 유지한 채 이 물질만 추가했더니 반응 속도가 빨라졌다. 이때 반응 속도가 빨라진 원리에 해당하는 것은?',
+     opts:[
+       {t:'효소에 의한 반응 속도 증가', c:true, f:'온도와 농도가 그대로인데도 속도가 빨라졌다면, 활성화에너지 장벽 자체가 낮아진 효소의 작용 때문입니다.'},
+       {t:'온도 상승에 의한 반응 속도 증가', c:false, f:'문제에서 온도는 일정하게 유지했다고 했으므로 온도 상승에 의한 반응 속도 증가가 아닙니다.'},
+       {t:'기질·효소농도 증가에 의한 반응 속도 증가', c:false, f:'문제에서 반응물의 농도도 일정하게 유지했다고 했으므로 농도 증가에 의한 증가가 아닙니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">효소에 의한 반응 속도 증가</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'반응물 입자의 운동이나 수는 변화시키지 않으면서, 반응이 일어나는 데 필요한 에너지 장벽 자체를 낮추는 방식이다', c:true, f:'입자의 운동·수는 그대로 두고 에너지 장벽 자체를 낮추는 것이 효소에 의한 반응 속도 증가입니다.'},
+       {t:'에너지 장벽의 크기는 그대로 둔 채, 분자 운동을 활발하게 만들어 효소-기질복합체가 더 빨리 형성되게 하는 방식이다', c:false, f:'이건 온도 상승에 의한 반응 속도 증가에 대한 설명입니다.'},
+       {t:'에너지 장벽의 크기나 분자 운동과 무관하게, 반응에 참여할 수 있는 입자의 수 자체를 늘리는 방식이다', c:false, f:'이건 기질·효소농도 증가에 의한 반응 속도 증가에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'이 방식으로 반응 속도가 빨라질 때는 에너지 장벽의 크기 자체는 변하지 않고, 반응물 분자의 운동이 활발해져 효소-기질복합체가 더 빨리 형성된다.',
+     opts:[
+       {t:'온도 상승에 의한 반응 속도 증가', c:true, f:'에너지 장벽은 그대로 두고 분자 운동을 활발하게 만들어 복합체 형성을 빠르게 하는 것은 온도 상승에 의한 반응 속도 증가입니다.'},
+       {t:'효소에 의한 반응 속도 증가', c:false, f:'효소에 의한 반응 속도 증가는 장벽 자체를 낮추는 방식인데, 이 설명은 장벽은 그대로 두고 분자 운동만 활발해지는 것이므로 온도 상승에 의한 반응 속도 증가입니다.'},
+       {t:'기질·효소농도 증가에 의한 반응 속도 증가', c:false, f:'농도 증가는 입자 수 자체를 늘리는 방식인데, 이 설명은 분자 운동이 활발해지는 것이므로 온도 상승에 의한 반응 속도 증가입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">온도 상승에 의한 반응 속도 증가</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'에너지 장벽의 크기나 반응물의 양은 그대로 둔 채, 분자의 운동을 활발하게 만들어 효소-기질복합체 형성을 빠르게 하는 방식이다', c:true, f:'장벽·양은 그대로 두고 분자 운동을 활발하게 만드는 것이 온도 상승에 의한 반응 속도 증가입니다.'},
+       {t:'분자 운동이나 양은 그대로 두고, 에너지 장벽 자체를 낮추는 방식이다', c:false, f:'이건 효소에 의한 반응 속도 증가에 대한 설명입니다.'},
+       {t:'분자 운동이나 에너지 장벽과 무관하게, 참여 가능한 입자 수 자체를 늘리는 방식이다', c:false, f:'이건 기질·효소농도 증가에 의한 반응 속도 증가에 대한 설명입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">온도 상승에 의한 반응 속도 증가</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'반응물의 양이나 효소의 활성화에너지 장벽 크기는 바꾸지 않으면서, 입자들의 움직임을 빠르게 만들어 반응이 일어날 기회를 늘리는 방식이다', c:true, f:'양·장벽은 그대로 두고 입자의 움직임을 빠르게 만드는 것이 온도 상승에 의한 반응 속도 증가입니다.'},
+       {t:'입자의 움직임은 그대로 둔 채 에너지 장벽 자체를 낮추는 방식이다', c:false, f:'이건 효소에 의한 반응 속도 증가에 대한 설명입니다.'},
+       {t:'입자의 움직임과 무관하게 반응에 참여 가능한 입자의 총수를 늘리는 방식이다', c:false, f:'이건 기질·효소농도 증가에 의한 반응 속도 증가에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'이 방식으로 반응 속도가 빨라질 때는 에너지 장벽의 크기나 개별 입자의 운동은 그대로인 채, 단위 부피당 반응에 참여할 수 있는 입자의 수 자체가 늘어나 충돌 빈도가 증가한다.',
+     opts:[
+       {t:'기질·효소농도 증가에 의한 반응 속도 증가', c:true, f:'장벽·운동은 그대로 두고 입자 수 자체를 늘려 충돌 빈도를 높이는 것은 농도 증가에 의한 반응 속도 증가입니다.'},
+       {t:'효소에 의한 반응 속도 증가', c:false, f:'효소에 의한 반응 속도 증가는 장벽 자체를 낮추는 방식인데, 이 설명은 입자 수를 늘리는 것이므로 농도 증가에 의한 증가입니다.'},
+       {t:'온도 상승에 의한 반응 속도 증가', c:false, f:'온도 상승은 분자 운동을 활발하게 만드는 방식인데, 이 설명은 입자 수 자체를 늘리는 것이므로 농도 증가에 의한 증가입니다.'}
+     ]},
+    {dir:'fwd', prompt:'기질의 농도를 계속 높이다가 존재하는 모든 효소가 이미 기질과 결합한 포화 상태에 이르면, 이 방식에 의한 반응 속도 증가는 더 이상 일어나지 않는다.',
+     opts:[
+       {t:'기질·효소농도 증가에 의한 반응 속도 증가', c:true, f:'포화 상태에 이르면 한계에 부딪히는 것은 입자 수 자체를 늘리는 방식인 농도 증가에 의한 반응 속도 증가입니다.'},
+       {t:'효소에 의한 반응 속도 증가', c:false, f:'효소 자체를 늘리는 것이 아니라 반응물의 농도에 대한 설명이므로 농도 증가에 의한 증가입니다.'},
+       {t:'온도 상승에 의한 반응 속도 증가', c:false, f:'온도와 무관하게 나타나는 포화 현상이므로 농도 증가에 의한 증가입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">기질·효소농도 증가에 의한 반응 속도 증가</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'에너지 장벽의 크기나 개별 입자의 운동과는 무관하게, 반응에 참여할 수 있는 입자의 수 자체를 늘려 충돌 빈도를 높이는 방식이다', c:true, f:'장벽·운동과 무관하게 입자 수 자체를 늘리는 것이 농도 증가에 의한 반응 속도 증가입니다.'},
+       {t:'입자 수는 그대로 둔 채 에너지 장벽 자체를 낮추는 방식이다', c:false, f:'이건 효소에 의한 반응 속도 증가에 대한 설명입니다.'},
+       {t:'입자 수는 그대로 둔 채 개별 입자의 운동을 활발하게 만드는 방식이다', c:false, f:'이건 온도 상승에 의한 반응 속도 증가에 대한 설명입니다.'}
+     ]}
+  ]
+},
+{
+  id:'B', code:'[12세포02-03]', name:'효소 작용에 영향을 미치는 요인',
+  items:[
+    {dir:'fwd', prompt:'효소의 주성분인 단백질은 이 값이 높아질수록 입체 구조의 움직임이 활발해져 반응 속도가 증가하다가, 지나치게 높아지면 구조가 변성되어 반응 속도가 급격히 떨어진다.',
+     opts:[
+       {t:'온도', c:true, f:'값이 높아지면 반응 속도가 증가하다가 일정 수준을 넘으면 단백질이 변성되어 속도가 급감하는 요인은 온도입니다.'},
+       {t:'기질의 농도', c:false, f:'기질의 농도는 일정 수준을 넘으면 속도가 더 이상 증가하지 않고 유지되는데, 이 설명은 값이 지나치면 속도가 급격히 감소하는 것이므로 온도입니다.'},
+       {t:'pH', c:false, f:'pH도 단백질 변성과 관련되지만, 이 설명은 입체 구조의 움직임이 활발해진다는 열에너지 관련 표현이므로 온도입니다.'}
+     ]},
+    {dir:'fwd', prompt:'효소 X의 반응 속도를 이 값을 달리하며 측정했더니, 값이 커질수록 속도가 증가하다가 체온과 비슷한 어느 지점을 지나자 반응 속도가 급격히 감소했다. 측정한 값은 무엇인가?',
+     opts:[
+       {t:'온도', c:true, f:'값이 커지다가 특정 지점을 지나면서 반응 속도가 급감하고, 그 값이 체온과 비슷한 범위에 있다는 것은 온도에 대한 설명입니다.'},
+       {t:'pH', c:false, f:'pH는 산성·염기성 정도를 나타내는 값인데, 이 설명은 체온과 비슷한 값을 지나 속도가 감소하는 것이므로 온도입니다.'},
+       {t:'경쟁적 억제제', c:false, f:'경쟁적 억제제는 물질의 존재 여부에 대한 것인데, 이 설명은 연속적으로 변하는 값에 대한 것이므로 온도입니다.'}
+     ]},
+    {dir:'fwd', prompt:'온천처럼 뜨거운 환경에 사는 미생물의 효소는 이 값이 사람 효소보다 훨씬 높아, 70°C 이상에서도 반응 속도가 최대로 유지된다. PCR 검사에 쓰이는 내열성 중합효소(Taq 중합효소)가 이런 특성을 갖도록 만드는 값은 무엇인가?',
+     opts:[
+       {t:'온도', c:true, f:'생물마다 반응 속도가 최대가 되는 지점(최적값)이 다르게 나타나며, 내열성 미생물의 효소는 이 값이 사람보다 훨씬 높습니다.'},
+       {t:'pH', c:false, f:'pH는 산성·염기성 정도를 나타내는 값인데, 이 설명은 뜨거운 환경에 대한 것이므로 온도입니다.'},
+       {t:'효소의 농도', c:false, f:'효소의 농도는 반응 속도가 최대가 되는 지점을 결정하는 값이 아닌데, 이 설명은 반응 속도가 최대가 되는 지점 자체가 다르다는 것이므로 온도입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">온도</span>가 효소의 작용에 미치는 영향에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'값이 높아질수록 반응 속도가 증가하다가, 일정 수준을 넘으면 단백질이 변성되어 반응 속도가 급격히 떨어진다', c:true, f:'값이 높아지다 일정 수준을 넘으면 단백질 변성으로 속도가 급감하는 것은 온도의 영향입니다.'},
+       {t:'값이 증가할수록 초기 반응 속도가 늘다가, 효소가 포화되면 속도가 더 이상 늘지 않고 일정해진다', c:false, f:'이건 기질의 농도에 대한 설명입니다.'},
+       {t:'효소의 활성부위에 직접 결합해 기질과 경쟁하며, 기질 농도가 높아지면 효과가 줄어든다', c:false, f:'이건 경쟁적 억제제에 대한 설명입니다.'},
+       {t:'활성부위가 아닌 다른 부위에 결합해 활성부위의 구조를 변화시킨다', c:false, f:'이건 비경쟁적 억제제에 대한 설명입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">온도</span>가 효소의 작용에 미치는 영향에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'값이 낮을 때는 분자 운동이 둔해 반응이 느리지만, 값이 높아질수록 분자 운동이 활발해져 반응이 빨라지다가 최적점을 넘으면 단백질이 변성되어 오히려 속도가 급감한다', c:true, f:'분자 운동과 관련지어 반응 속도가 변하다가 최적점을 넘으면 급감하는 것은 온도의 영향입니다.'},
+       {t:'최적 범위를 벗어나면 단백질의 입체 구조가 변형되어 활성부위 모양이 달라진다', c:false, f:'이건 pH에 대한 설명입니다.'},
+       {t:'값이 증가할수록 속도가 늘다가 포화 상태에서 일정해진다', c:false, f:'이건 기질의 농도에 대한 설명입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">온도</span>가 효소의 작용에 미치는 영향에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'온천에 사는 내열성 미생물의 효소처럼, 생물 종에 따라 반응 속도가 최대가 되는 지점이 서로 다르게 나타날 수 있으며, 이 지점을 넘으면 단백질이 비가역적으로 변성된다', c:true, f:'생물 종마다 반응 속도가 최대가 되는 지점이 다르게 나타나고, 그 지점을 넘으면 단백질이 변성되는 것은 온도의 영향입니다.'},
+       {t:'산성·염기성 정도를 나타내는 값으로, 소화효소마다 최적 지점이 다르게 나타난다', c:false, f:'이건 pH에 대한 설명입니다.'},
+       {t:'기질과 구조가 비슷한 물질이 활성부위를 두고 기질과 경쟁하는 현상이다', c:false, f:'이건 경쟁적 억제제에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'단백질인 효소는 이 값이 최적 범위를 벗어나면 입체 구조가 변형되어 활성부위 모양이 달라지고, 결국 반응 속도가 크게 떨어진다.',
+     opts:[
+       {t:'pH', c:true, f:'최적 범위를 벗어나면 단백질의 입체 구조를 변형시켜 반응 속도를 떨어뜨리는 값은 pH입니다.'},
+       {t:'기질의 농도', c:false, f:'기질의 농도는 효소의 입체 구조를 변형시키지 않는데, 이 설명은 입체 구조 변형에 대한 것이므로 pH입니다.'},
+       {t:'비경쟁적 억제제', c:false, f:'비경쟁적 억제제는 특정 물질의 결합에 대한 것인데, 이 설명은 연속적으로 변하는 환경 값에 대한 것이므로 pH입니다.'}
+     ]},
+    {dir:'fwd', prompt:'효소 X와 효소 Y의 반응 속도를 이 값을 달리하며 측정했더니, X는 산성 쪽에서, Y는 염기성 쪽에서 반응 속도가 가장 높게 나타났다. 이처럼 효소마다 속도가 최대가 되는 지점이 서로 다르게 나타나는 값은 무엇인가?',
+     opts:[
+       {t:'pH', c:true, f:'효소마다 반응 속도가 최대가 되는 지점(최적 pH)이 다르게 나타나는 값은 pH입니다.'},
+       {t:'온도', c:false, f:'온도도 효소마다 최적값이 다를 수 있지만, 이 설명은 산성·염기성 정도로 구분했으므로 pH입니다.'},
+       {t:'기질의 농도', c:false, f:'기질의 농도는 산성·염기성과 무관한 값인데, 이 설명은 산성·염기성 정도에 대한 것이므로 pH입니다.'}
+     ]},
+    {dir:'fwd', prompt:'몸속 여러 소화효소는 작용하는 소화기관에 따라 반응 속도가 최대가 되는 이 값이 서로 다르게 나타난다.',
+     opts:[
+       {t:'pH', c:true, f:'소화기관마다 환경이 산성 또는 염기성으로 다르기 때문에, 각 소화효소가 반응 속도 최댓값을 나타내는 pH도 서로 다릅니다.'},
+       {t:'온도', c:false, f:'몸속 온도는 소화기관에 따라 크게 달라지지 않는데, 이 설명은 소화기관마다 다르게 나타나는 값이므로 pH입니다.'},
+       {t:'경쟁적 억제제', c:false, f:'경쟁적 억제제는 특정 물질의 결합에 대한 것인데, 이 설명은 환경 값의 차이에 대한 것이므로 pH입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">pH</span>가 효소의 작용에 미치는 영향에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'이 값이 적정 범위를 넘어서면 단백질로 이루어진 효소의 입체 구조가 뒤틀리면서 활성부위 모양이 바뀌고, 그 결과 반응 속도가 뚜렷하게 낮아진다', c:true, f:'적정 범위를 넘어서면 단백질 입체 구조가 뒤틀려 반응 속도를 낮추는 것은 pH의 영향입니다.'},
+       {t:'값이 증가할수록 반응 속도가 늘다가 일정 수준에서 포화되어 더 이상 늘지 않는다', c:false, f:'이건 기질의 농도에 대한 설명입니다.'},
+       {t:'값이 높아지다가 일정 지점을 지나면 반응 속도가 급격히 감소한다', c:false, f:'이건 온도에 대한 설명입니다.'},
+       {t:'활성부위를 기질 대신 차지해 기질의 결합을 방해한다', c:false, f:'이건 경쟁적 억제제에 대한 설명입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">pH</span>가 효소의 작용에 미치는 영향에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'값이 산성이든 염기성이든 최적 범위를 벗어나기만 하면 단백질의 입체 구조가 변형되어 반응 속도가 급격히 떨어진다', c:true, f:'최적 범위를 벗어나면(산성·염기성 무관) 단백질 구조가 변형되는 것은 pH의 영향입니다.'},
+       {t:'값이 높아지다 일정 지점을 넘으면 단백질이 변성되어 반응 속도가 급격히 떨어진다', c:false, f:'이건 온도에 대한 설명입니다.'},
+       {t:'활성부위가 아닌 다른 부위에 결합해 활성부위의 구조를 변화시킨다', c:false, f:'이건 비경쟁적 억제제에 대한 설명입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">pH</span>가 효소의 작용에 미치는 영향에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'위에서 작용하는 소화효소와 작은창자에서 작용하는 소화효소처럼, 작용하는 장소의 환경에 따라 최적값이 다르게 나타나는 값이다', c:true, f:'작용 장소의 산성·염기성 환경에 따라 최적값이 다르게 나타나는 것은 pH입니다.'},
+       {t:'값이 증가할수록 초기 반응 속도가 늘다가 포화 상태에서 일정해진다', c:false, f:'이건 기질의 농도에 대한 설명입니다.'},
+       {t:'기질과 구조가 비슷해 활성부위를 두고 기질과 경쟁하는 물질이다', c:false, f:'이건 경쟁적 억제제에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'효소의 농도가 일정할 때 이 값이 증가할수록 초기 반응 속도가 증가하다가, 일정 수준을 넘으면 존재하는 모든 효소가 이미 기질과 결합한 상태(포화 상태)가 되어 반응 속도가 더 이상 증가하지 않고 일정해진다.',
+     opts:[
+       {t:'기질의 농도', c:true, f:'값이 증가하다가 효소가 포화되면 반응 속도가 더 늘지 않고 일정해지는 것은 기질의 농도에 대한 설명입니다.'},
+       {t:'온도', c:false, f:'온도가 지나치게 높아지면 오히려 반응 속도가 감소하는데, 이 설명은 증가 후 일정해지는 것이므로 기질의 농도입니다.'},
+       {t:'비경쟁적 억제제', c:false, f:'비경쟁적 억제제는 반응 속도의 최댓값 자체를 낮추는데, 이 설명은 속도가 늘다가 일정 수준에서 유지되는 것이므로 기질의 농도입니다.'}
+     ]},
+    {dir:'fwd', prompt:'반응 용액 속 이 값이 낮을 때는 효소 분자 중 일부만 기질과 결합해 있지만, 이 값이 충분히 높아지면 존재하는 모든 효소가 기질과 결합한 상태가 되어 반응 속도가 최댓값에 도달한다.',
+     opts:[
+       {t:'기질의 농도', c:true, f:'효소 분자가 기질과 결합하는 비율에 영향을 주며, 충분히 높아지면 반응 속도를 최댓값에 이르게 하는 값은 기질의 농도입니다.'},
+       {t:'pH', c:false, f:'pH는 효소의 입체 구조에 영향을 주는 값인데, 이 설명은 효소와 결합하는 물질의 양에 대한 것이므로 기질의 농도입니다.'},
+       {t:'경쟁적 억제제', c:false, f:'경쟁적 억제제는 효소와 결합해 기질의 결합을 방해하는 물질인데, 이 설명은 기질 자체의 양에 대한 것이므로 기질의 농도입니다.'}
+     ]},
+    {dir:'fwd', prompt:'효소의 농도와 온도, pH를 모두 일정하게 고정한 채 이 값만 계속 늘렸더니, 처음에는 반응 속도가 비례해서 증가했지만 일정 수준을 넘어서자 더는 증가하지 않고 수평을 유지했다. 이 값은 무엇인가?',
+     opts:[
+       {t:'기질의 농도', c:true, f:'효소의 농도·온도·pH가 고정된 상태에서 늘려서 반응 속도가 늘다가 포화되는 값은 기질의 농도입니다.'},
+       {t:'효소의 농도', c:false, f:'효소의 농도는 문제에서 고정했다고 했으므로 늘어난 값이 아닙니다.'},
+       {t:'온도', c:false, f:'온도도 문제에서 고정했다고 했으므로 늘어난 값이 아닙니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">기질의 농도</span>가 효소의 작용에 미치는 영향에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'값이 증가할수록 초기 반응 속도가 늘다가, 모든 효소가 기질과 결합한 포화 상태가 되면 반응 속도가 더 이상 늘지 않고 일정해진다', c:true, f:'증가하다가 효소가 포화되면 속도가 일정해지는 것은 기질의 농도의 영향입니다.'},
+       {t:'최적 범위를 벗어나면 단백질의 입체 구조가 변형되어 반응 속도가 떨어진다', c:false, f:'이건 pH(또는 온도)에 대한 설명입니다.'},
+       {t:'활성부위가 아닌 다른 부위에 결합해 반응 속도의 최댓값 자체를 낮춘다', c:false, f:'이건 비경쟁적 억제제에 대한 설명입니다.'},
+       {t:'값이 일정 수준을 넘으면 단백질이 변성되어 반응 속도가 급격히 감소한다', c:false, f:'이건 온도에 대한 설명입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">기질의 농도</span>가 효소의 작용에 미치는 영향에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'농도가 낮은 동안은 일부 효소만 기질과 결합해 있다가, 농도가 점점 높아져 모든 효소 분자가 기질과 결합하고 나면 반응 속도는 더 이상 오르지 않고 최댓값을 유지한다', c:true, f:'농도가 낮을 때는 일부만 결합해 있다가, 모든 효소가 포화되면 최댓값을 유지하는 것은 기질의 농도의 영향입니다.'},
+       {t:'효소 자체의 양이 늘어나 반응에 참여할 수 있는 효소 분자 수 자체가 증가하는 값이다', c:false, f:'이건 효소의 농도에 대한 설명입니다.'},
+       {t:'값이 지나치게 높아지면 단백질이 변성되어 반응 속도가 오히려 감소한다', c:false, f:'이건 온도에 대한 설명입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">기질의 농도</span>가 효소의 작용에 미치는 영향에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'반응 용액 속 이 값이 낮을 때는 효소 분자 중 일부만 기질과 결합해 있지만, 충분히 높아지면 모든 효소가 기질과 결합한 상태가 되어 반응 속도가 최댓값에 이른다', c:true, f:'충분히 높아지면 모든 효소가 포화되어 최댓값에 이르는 것은 기질의 농도의 영향입니다.'},
+       {t:'기질과 구조가 비슷해 활성부위에 직접 결합하는 물질의 양이다', c:false, f:'이건 경쟁적 억제제에 대한 설명입니다.'},
+       {t:'산성·염기성 정도를 나타내는 값으로, 효소의 입체 구조에 영향을 준다', c:false, f:'이건 pH에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'기질의 농도를 충분히 많아 효소가 모두 포화된 상태로 고정해 두고 이 값만 늘렸더니, 반응에 동시에 참여할 수 있는 효소 분자 수 자체가 늘어나 반응 속도의 최댓값이 더 높아졌다. 이 값은 무엇인가?',
+     opts:[
+       {t:'효소의 농도', c:true, f:'기질이 충분한 상태에서 늘렸을 때 반응 속도의 최댓값 자체를 높이는 값은 효소의 농도입니다.'},
+       {t:'기질의 농도', c:false, f:'기질은 이미 충분히 많은 상태로 고정했다고 했으므로 늘어난 값이 아닙니다.'},
+       {t:'온도', c:false, f:'온도 변화에 대한 언급이 없으므로 온도가 아닙니다.'}
+     ]},
+    {dir:'fwd', prompt:'기질의 농도를 일정하게 유지한 채 이 값만 두 배로 늘렸더니, 동시에 기질과 결합할 수 있는 효소 분자 수가 늘어나 초기 반응 속도도 함께 증가했다.',
+     opts:[
+       {t:'효소의 농도', c:true, f:'기질 농도가 일정한 상태에서 늘려 초기 반응 속도를 높이는 값은 효소의 농도입니다.'},
+       {t:'기질의 농도', c:false, f:'기질은 일정하게 유지했다고 했으므로 늘어난 값이 아닙니다.'},
+       {t:'경쟁적 억제제', c:false, f:'경쟁적 억제제는 억제 물질에 대한 설명인데, 이 설명은 반응 속도를 높이는 값에 대한 것이므로 효소의 농도입니다.'}
+     ]},
+    {dir:'fwd', prompt:'이 값이 늘어나면 반응이 최댓값에 도달하는 데 필요한 기질의 양도 함께 늘어난다. 효소 분자가 많아진 만큼, 그 효소들을 모두 포화시키려면 더 많은 기질이 필요하기 때문이다.',
+     opts:[
+       {t:'효소의 농도', c:true, f:'늘어나면 효소를 모두 포화시키는 데 필요한 기질의 양도 함께 늘어나게 만드는 값은 효소의 농도입니다.'},
+       {t:'기질의 농도', c:false, f:'기질 자체가 아니라 효소 쪽 변수에 대한 설명이므로 효소의 농도입니다.'},
+       {t:'비경쟁적 억제제', c:false, f:'비경쟁적 억제제는 억제 물질에 대한 설명인데, 이 설명은 효소 분자 수에 대한 것이므로 효소의 농도입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">효소의 농도</span>가 효소의 작용에 미치는 영향에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'기질이 충분히 많은 상태에서 이 값이 늘어나면, 동시에 기질과 결합할 수 있는 효소 분자 수가 늘어나 반응 속도의 최댓값 자체가 높아진다', c:true, f:'기질이 충분할 때 늘리면 반응 속도의 최댓값을 높이는 것은 효소의 농도의 영향입니다.'},
+       {t:'값이 증가할수록 반응 속도가 늘다가 효소가 모두 포화되면 더 이상 늘지 않는다', c:false, f:'이건 기질의 농도에 대한 설명입니다.'},
+       {t:'값이 최적 지점을 넘으면 단백질이 변성되어 반응 속도가 급격히 떨어진다', c:false, f:'이건 온도에 대한 설명입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">효소의 농도</span>가 효소의 작용에 미치는 영향에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'이 값이 늘어나면 모든 효소를 포화시키는 데 필요한 기질의 양도 함께 늘어나므로, 반응 속도가 최댓값에 도달하는 기질 농도의 지점이 더 높은 쪽으로 이동한다', c:true, f:'늘어나면 최댓값 도달에 필요한 기질 농도의 지점이 이동하게 만드는 값은 효소의 농도입니다.'},
+       {t:'기질과 구조가 비슷해 활성부위를 두고 기질과 직접 경쟁하는 물질의 양이다', c:false, f:'이건 경쟁적 억제제에 대한 설명입니다.'},
+       {t:'산성·염기성 정도를 나타내는 값으로 단백질의 입체 구조에 영향을 준다', c:false, f:'이건 pH에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'효소의 활성부위에 기질과 매우 비슷한 구조로 직접 결합해서, 기질이 활성부위에 결합하지 못하게 방해하는 물질이다. 기질의 농도를 충분히 높이면 이 물질의 억제 효과는 줄어든다.',
+     opts:[
+       {t:'경쟁적 억제제', c:true, f:'기질과 구조가 비슷해 활성부위를 두고 기질과 경쟁하며, 기질 농도를 높이면 효과가 줄어드는 것은 경쟁적 억제제입니다.'},
+       {t:'비경쟁적 억제제', c:false, f:'비경쟁적 억제제는 기질 농도를 높여도 억제 효과가 줄지 않는데, 이 설명은 기질 농도를 높이면 효과가 줄어드는 것이므로 경쟁적 억제제입니다.'},
+       {t:'금속이온', c:false, f:'금속이온은 전효소를 이루는 보조인자인데, 이 설명은 활성부위를 두고 기질과 경쟁하는 억제 물질에 대한 것이므로 경쟁적 억제제입니다.'}
+     ]},
+    {dir:'fwd', prompt:'이 물질이 효소의 활성부위를 기질 대신 차지하고 있으면, 기질 농도가 낮을 때는 억제 효과가 크게 나타나지만 기질 농도가 매우 높아지면 상대적으로 기질이 결합할 확률이 높아져 억제 효과가 약해진다.',
+     opts:[
+       {t:'경쟁적 억제제', c:true, f:'기질과 활성부위를 두고 경쟁하며, 기질 농도가 높아지면 억제 효과가 약해지는 것은 경쟁적 억제제의 특징입니다.'},
+       {t:'비경쟁적 억제제', c:false, f:'비경쟁적 억제제는 기질 농도와 관계없이 억제 효과가 유지되는데, 이 설명은 기질 농도에 따라 효과가 달라지므로 경쟁적 억제제입니다.'},
+       {t:'조효소', c:false, f:'조효소는 효소의 정상적인 작용을 돕는 보조인자인데, 이 설명은 효소의 작용을 방해하는 억제 물질이므로 경쟁적 억제제입니다.'}
+     ]},
+    {dir:'fwd', prompt:'이 물질은 효소의 활성부위에 기질 대신 결합해 기질의 결합을 방해하지만, 기질의 농도를 아주 높게 만들면 상대적으로 기질이 결합할 확률이 높아져 결국 억제제가 없을 때와 같은 최대 반응 속도에 도달할 수 있다.',
+     opts:[
+       {t:'경쟁적 억제제', c:true, f:'기질 농도를 충분히 높이면 억제제가 없을 때와 같은 최대 속도에 도달할 수 있는 것은 경쟁적 억제제입니다.'},
+       {t:'비경쟁적 억제제', c:false, f:'비경쟁적 억제제는 기질 농도를 아무리 높여도 최대 속도에 도달하지 못하는데, 이 설명은 도달 가능하다고 했으므로 경쟁적 억제제입니다.'},
+       {t:'금속이온', c:false, f:'금속이온은 전효소를 구성하는 보조인자인데, 이 설명은 효소 작용을 방해하는 억제 물질에 대한 것이므로 경쟁적 억제제입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">경쟁적 억제제</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'기질과 구조가 비슷해 효소의 활성부위에 직접 결합하며, 기질의 농도를 높이면 억제 효과가 줄어든다', c:true, f:'기질과 활성부위를 두고 경쟁하며 기질 농도를 높이면 효과가 줄어드는 것은 경쟁적 억제제입니다.'},
+       {t:'활성부위가 아닌 다른 부위에 결합해 활성부위의 구조를 바꾸며, 기질 농도와 무관하게 효과가 유지된다', c:false, f:'이건 비경쟁적 억제제에 대한 설명입니다.'},
+       {t:'값이 최적 범위를 벗어나면 효소의 입체 구조가 변형된다', c:false, f:'이건 pH에 대한 설명입니다.'},
+       {t:'값이 증가할수록 반응 속도가 늘다가 포화 상태에서 일정해진다', c:false, f:'이건 기질의 농도에 대한 설명입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">경쟁적 억제제</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'기질과 입체 구조가 비슷하여 활성부위를 두고 기질과 직접 경쟁하며, 기질의 농도를 충분히 높이면 억제제 없이 반응할 때와 같은 최대 속도에 도달할 수 있다', c:true, f:'기질 농도를 충분히 높이면 억제제 없을 때와 같은 최대 속도에 도달할 수 있는 것은 경쟁적 억제제입니다.'},
+       {t:'활성부위가 아닌 다른 부위에 결합해 활성부위의 구조 자체를 바꾸며, 기질 농도와 무관하게 억제 효과가 유지된다', c:false, f:'이건 비경쟁적 억제제에 대한 설명입니다.'},
+       {t:'효소 분자 자체의 수를 늘려 반응 속도의 최댓값을 높이는 값이다', c:false, f:'이건 효소의 농도에 대한 설명입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">경쟁적 억제제</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'기질의 양이 적을 때는 이 물질의 방해 효과가 두드러지지만, 기질을 충분히 늘리면 기질이 활성부위를 차지할 확률이 상대적으로 커지면서 방해 효과가 점차 줄어든다', c:true, f:'기질의 양이 많아지면 억제 효과가 줄어드는 것은 경쟁적 억제제의 특징입니다.'},
+       {t:'기질 농도를 아무리 높여도 억제 효과가 줄어들지 않고 그대로 유지된다', c:false, f:'이건 비경쟁적 억제제에 대한 설명입니다.'},
+       {t:'값이 지나치게 높아지면 단백질이 변성되어 반응 속도가 급격히 감소한다', c:false, f:'이건 온도에 대한 설명입니다.'}
+     ]},
+
+    {dir:'fwd', prompt:'효소의 활성부위가 아닌 다른 부위에 결합해서 활성부위의 입체 구조 자체를 변화시키는 물질로, 기질의 농도를 아무리 높여도 이 물질의 억제 효과는 줄어들지 않는다.',
+     opts:[
+       {t:'비경쟁적 억제제', c:true, f:'활성부위가 아닌 다른 부위에 결합해 활성부위의 구조를 바꾸며, 기질 농도와 무관하게 억제 효과가 유지되는 것은 비경쟁적 억제제입니다.'},
+       {t:'경쟁적 억제제', c:false, f:'경쟁적 억제제는 기질 농도를 높이면 억제 효과가 줄어드는데, 이 설명은 기질 농도와 무관하게 효과가 유지되므로 비경쟁적 억제제입니다.'},
+       {t:'가수분해효소', c:false, f:'가수분해효소는 물을 이용해 기질을 분해하는 효소인데, 이 설명은 효소의 작용을 방해하는 억제 물질이므로 비경쟁적 억제제입니다.'}
+     ]},
+    {dir:'fwd', prompt:'이 물질이 결합하면 효소의 활성부위 모양이 달라져 기질이 더 이상 그 부위에 들어맞지 않게 되므로, 기질 농도와 무관하게 반응 속도의 최댓값 자체가 낮아진다.',
+     opts:[
+       {t:'비경쟁적 억제제', c:true, f:'활성부위의 모양 자체를 바꾸어 기질 농도와 무관하게 반응 속도의 최댓값을 낮추는 것은 비경쟁적 억제제입니다.'},
+       {t:'경쟁적 억제제', c:false, f:'경쟁적 억제제는 기질 농도가 충분히 높아지면 반응 속도의 최댓값에 다시 도달할 수 있는데, 이 설명은 최댓값 자체가 낮아지는 것이므로 비경쟁적 억제제입니다.'},
+       {t:'주효소', c:false, f:'주효소는 전효소를 이루는 단백질 부분인데, 이 설명은 효소의 작용을 방해하는 억제 물질이므로 비경쟁적 억제제입니다.'}
+     ]},
+    {dir:'fwd', prompt:'이 물질은 효소의 활성부위가 아닌 다른 부위에 결합해 활성부위의 입체 구조 자체를 변형시키므로, 기질의 농도를 아무리 높여도 기질이 원래대로 결합하지 못해 억제 효과가 사라지지 않는다.',
+     opts:[
+       {t:'비경쟁적 억제제', c:true, f:'활성부위 외의 부위에 결합해 구조를 변형시키므로 기질 농도와 무관하게 억제 효과가 유지되는 것은 비경쟁적 억제제입니다.'},
+       {t:'경쟁적 억제제', c:false, f:'경쟁적 억제제는 기질 농도를 높이면 억제 효과가 줄어드는데, 이 설명은 줄지 않는다고 했으므로 비경쟁적 억제제입니다.'},
+       {t:'조효소', c:false, f:'조효소는 효소의 정상 작용을 돕는 보조인자인데, 이 설명은 작용을 방해하는 물질이므로 비경쟁적 억제제입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">비경쟁적 억제제</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'활성부위가 아닌 다른 부위에 결합해 활성부위의 구조를 변화시키며, 기질 농도를 아무리 높여도 억제 효과가 줄지 않는다', c:true, f:'기질 농도와 무관하게 억제 효과가 유지되는 것은 비경쟁적 억제제입니다.'},
+       {t:'기질과 구조가 비슷해 활성부위에 직접 결합하며, 기질 농도를 높이면 억제 효과가 줄어든다', c:false, f:'이건 경쟁적 억제제에 대한 설명입니다.'},
+       {t:'값이 높아질수록 반응 속도가 늘다가 일정 지점을 지나면 급격히 감소한다', c:false, f:'이건 온도에 대한 설명입니다.'},
+       {t:'값이 산성 또는 염기성 쪽으로 최적 범위를 벗어나면 반응 속도가 떨어진다', c:false, f:'이건 pH에 대한 설명입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">비경쟁적 억제제</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'활성부위가 아닌 다른 부위에 결합해 활성부위의 입체 구조 자체를 바꾸므로, 기질의 농도를 아무리 높여도 억제 효과가 사라지지 않고 반응 속도의 최댓값 자체가 낮아진다', c:true, f:'기질 농도와 무관하게 반응 속도의 최댓값 자체를 낮추는 것은 비경쟁적 억제제입니다.'},
+       {t:'기질과 구조가 비슷해 활성부위에 직접 결합하며, 기질 농도가 높아지면 억제 효과가 약해진다', c:false, f:'이건 경쟁적 억제제에 대한 설명입니다.'},
+       {t:'최적 범위를 벗어나면 단백질의 입체 구조가 변형되어 반응 속도가 떨어진다', c:false, f:'이건 pH에 대한 설명입니다.'}
+     ]},
+    {dir:'rev', label:'다음 중 <span class="target">비경쟁적 억제제</span>에 해당하는 설명을 고르시오.', prompt:'',
+     opts:[
+       {t:'결합 부위가 활성부위와 다르기 때문에 기질과 이 물질이 서로 경쟁하지 않으며, 그 결과 기질 농도를 아무리 조절해도 억제된 반응 속도의 최댓값은 회복되지 않는다', c:true, f:'기질과 경쟁하지 않고 기질 농도를 조절해도 최댓값이 회복되지 않는 것은 비경쟁적 억제제입니다.'},
+       {t:'활성부위를 두고 기질과 직접 경쟁하는 물질로, 기질 농도를 높이면 극복할 수 있다', c:false, f:'이건 경쟁적 억제제에 대한 설명입니다.'},
+       {t:'효소 분자 수 자체를 늘려 반응 속도의 최댓값을 높이는 값이다', c:false, f:'이건 효소의 농도에 대한 설명입니다.'}
+     ]}
+  ]
+}
+];
+
+let curFw = null;
+let curFwId = null;
+let pendingFwId = null;
+let itemIdx = 0;
+let firstTryResults = [];
+let roundSeconds = 15;
+let timerInterval = null;
+let lastRoundIndices = {}; // 주제별 직전 라운드에 출제된 문항 인덱스 (다시 풀기 시 겹치지 않게)
+
+const STATS_KEY = 'metabolism_unit4_stats_v2';
+
+function loadStats(){
+  try{
+    const raw = localStorage.getItem(STATS_KEY);
+    if(!raw) return frameworks.map(()=>({correct:0,total:0}));
+    const saved = JSON.parse(raw);
+    return frameworks.map(fw=>{
+      const found = saved && saved[fw.id];
+      return (found && typeof found.correct==='number' && typeof found.total==='number')
+        ? {correct: found.correct, total: found.total}
+        : {correct:0, total:0};
+    });
+  } catch(e){
+    return frameworks.map(()=>({correct:0,total:0}));
+  }
+}
+
+function saveStats(){
+  try{
+    const obj = {};
+    frameworks.forEach((fw,i)=>{ obj[fw.id] = sessionStats[i]; });
+    localStorage.setItem(STATS_KEY, JSON.stringify(obj));
+  } catch(e){
+    // 저장 실패(예: 프라이빗 모드)해도 학습 자체는 계속 진행되도록 조용히 무시
+  }
+}
+
+function resetStats(){
+  if(!confirm('지금까지 쌓인 학습 기록을 전부 초기화할까요? 되돌릴 수 없어요.')) return;
+  sessionStats = frameworks.map(()=>({correct:0,total:0}));
+  try{ localStorage.removeItem(STATS_KEY); } catch(e){}
+  renderStats();
+}
+
+let sessionStats = loadStats();
+
+function renderTabs(){
+  const bar = document.getElementById('tabBar');
+  bar.innerHTML = '';
+  frameworks.forEach(fw=>{
+    const d = document.createElement('div');
+    d.className = 'tab';
+    d.onclick = ()=>openDifficultyScreen(fw.id);
+    d.innerHTML = `<span class="name">${fw.name}</span>`;
+    bar.appendChild(d);
+  });
+}
+
+const ROUND_SIZE = {A:7, B:7};
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function openDifficultyScreen(id){
+  pendingFwId = id;
+  const fw = frameworks.find(f=>f.id===id);
+  document.getElementById('diffTitle').textContent = `${fw.name} · 시간 설정`;
+  document.getElementById('tabBar').classList.add('hidden');
+  document.getElementById('itemScreen').classList.add('hidden');
+  document.getElementById('summaryScreen').classList.add('hidden');
+  document.getElementById('difficultyScreen').classList.remove('hidden');
+  document.getElementById('diffSlider').value = 15;
+  updateDiffDisplay();
+}
+
+function updateDiffDisplay(){
+  const slider = document.getElementById('diffSlider');
+  const v = parseInt(slider.value, 10);
+  const pct = ((v - 5) / (30 - 5)) * 100;
+  let color, label;
+  if(v <= 10){ color = '#E2555C'; label = '빠른 판단 연습'; }
+  else if(v <= 20){ color = '#E8C547'; label = '표준 속도'; }
+  else { color = '#45D6A0'; label = '여유롭게 생각하기'; }
+  slider.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #453D63 ${pct}%, #453D63 100%)`;
+  const valueEl = document.getElementById('diffValue');
+  valueEl.textContent = v + '초';
+  valueEl.style.color = color;
+  document.getElementById('diffLabel').textContent = label;
+}
+
+function confirmDifficulty(){
+  const v = parseInt(document.getElementById('diffSlider').value, 10);
+  startFramework(pendingFwId, v);
+}
+
+function itemTopic(item){
+  // 문항이 다루는 '소재'를 정답 카테고리(정방향) 또는 target 라벨(역방향)에서 추출
+  if(item.dir === 'fwd'){
+    const correct = item.opts.find(o=>o.c);
+    return correct ? correct.t : 'unknown';
+  }
+  const m = item.label.match(/<span class="target">(.*?)<\/span>/);
+  return m ? m[1] : item.label;
+}
+
+function pickBalancedRound(base, id, size){
+  const allIdx = base.items.map((_,i)=>i);
+  const prevUsed = new Set(lastRoundIndices[id] || []);
+  let pool = allIdx.filter(i => !prevUsed.has(i));
+  if(pool.length < size) pool = allIdx.slice(); // 안전장치(현재 뱅크 규모상 발생하지 않음)
+
+  // 소재별로 그룹화(같은 소재를 한 회차에 중복 출제하지 않기 위함), 그룹 내부는 방향별로 분리
+  const byTopic = {};
+  pool.forEach(i => {
+    const t = itemTopic(base.items[i]);
+    if(!byTopic[t]) byTopic[t] = {fwd:[], rev:[]};
+    byTopic[t][base.items[i].dir].push(i);
+  });
+  Object.values(byTopic).forEach(g => { g.fwd = shuffle(g.fwd); g.rev = shuffle(g.rev); });
+
+  let topics = shuffle(Object.keys(byTopic));
+  const chosen = [];
+  let fwdCount = 0, revCount = 0;
+  const targetFwd = Math.ceil(size / 2);
+  let ti = 0, guard = 0;
+
+  while(chosen.length < size && guard < 1000){
+    guard++;
+    if(ti >= topics.length){
+      // 모든 소재를 한 바퀴 돌았는데 아직 부족하면(주제 수가 출제 수보다 적을 때) 남은 소재로 다시 순회
+      topics = shuffle(topics.filter(t => byTopic[t].fwd.length + byTopic[t].rev.length > 0));
+      ti = 0;
+      if(topics.length === 0) break;
+    }
+    const g = byTopic[topics[ti]];
+    const wantFwd = fwdCount < targetFwd;
+    let pickedIdx = null;
+    if(wantFwd && g.fwd.length) pickedIdx = g.fwd.shift();
+    else if(!wantFwd && g.rev.length) pickedIdx = g.rev.shift();
+    else if(g.fwd.length) pickedIdx = g.fwd.shift();
+    else if(g.rev.length) pickedIdx = g.rev.shift();
+
+    if(pickedIdx !== null){
+      chosen.push(pickedIdx);
+      if(base.items[pickedIdx].dir === 'fwd') fwdCount++; else revCount++;
+    }
+    ti++;
+  }
+
+  const chosenIdx = shuffle(chosen);
+  lastRoundIndices[id] = chosenIdx.slice();
+  return chosenIdx.map(i => base.items[i]);
+}
+
+function startFramework(id, seconds){
+  roundSeconds = seconds;
+  const base = frameworks.find(f=>f.id===id);
+  curFw = {
+    ...base,
+    items: pickBalancedRound(base, id, ROUND_SIZE[id]).map(it => ({...it, opts: shuffle(it.opts)}))
+  };
+  curFwId = id;
+  itemIdx = 0;
+  firstTryResults = [];
+  document.getElementById('difficultyScreen').classList.add('hidden');
+  document.getElementById('summaryScreen').classList.add('hidden');
+  document.getElementById('itemScreen').classList.remove('hidden');
+  renderItem();
+}
+
+// ---- 정답/오답 사운드 + 음소거 (규칙 9) ----
+let audioCtx = null;
+let isMuted = (localStorage.getItem('quizMuted') === '1');
+
+function getAudioCtx(){
+  if(!audioCtx){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AC();
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playTone(freq, duration, type, delay){
+  if(isMuted) return;
+  try{
+    const ctx = getAudioCtx();
+    const start = ctx.currentTime + (delay||0);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, start);
+    gain.gain.setValueAtTime(0.001, start);
+    gain.gain.exponentialRampToValueAtTime(0.16, start + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(start);
+    osc.stop(start + duration + 0.02);
+  }catch(e){}
+}
+
+function playCorrectSound(){
+  playTone(660, 0.11, 'sine', 0);
+  playTone(880, 0.16, 'sine', 0.08);
+}
+function playWrongSound(){
+  playTone(196, 0.22, 'square', 0);
+}
+
+function toggleMute(){
+  isMuted = !isMuted;
+  localStorage.setItem('quizMuted', isMuted ? '1' : '0');
+  updateMuteBtn();
+  if(!isMuted) getAudioCtx();
+}
+function updateMuteBtn(){
+  const btn = document.getElementById('muteBtn');
+  if(btn) btn.textContent = isMuted ? '🔇' : '🔊';
+}
+
+function showFeedbackIcon(btn, ok){
+  if(!btn) return;
+  const icon = document.createElement('div');
+  icon.className = 'fb-icon ' + (ok?'ok':'bad');
+  icon.textContent = ok ? '✓' : '✗';
+  btn.appendChild(icon);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>icon.classList.add('show')));
+}
+
+function goHome(){
+  clearInterval(timerInterval);
+  document.getElementById('tabBar').classList.remove('hidden');
+  document.getElementById('difficultyScreen').classList.add('hidden');
+  document.getElementById('itemScreen').classList.add('hidden');
+  document.getElementById('summaryScreen').classList.add('hidden');
+}
+
+function startTimer(onTimeout){
+  clearInterval(timerInterval);
+  let timeLeft = roundSeconds;
+  const fill = document.getElementById('timerBarFill');
+  const num = document.getElementById('timerNum');
+  const render = ()=>{
+    const pct = Math.max(0, (timeLeft/roundSeconds)*100);
+    fill.style.width = pct + '%';
+    fill.style.background = pct <= 25 ? 'var(--bad)' : (pct <= 55 ? 'var(--point)' : 'var(--good)');
+    num.textContent = timeLeft + '초';
+  };
+  fill.style.transition = 'none';
+  render();
+  fill.offsetHeight;
+  fill.style.transition = 'width 1s linear, background-color .3s';
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    if(timeLeft <= 0){
+      clearInterval(timerInterval);
+      timeLeft = 0;
+      render();
+      onTimeout();
+    } else {
+      render();
+    }
+  }, 1000);
+}
+
+function renderItem(){
+  const total = curFw.items.length;
+  const prog = document.getElementById('progress');
+  prog.innerHTML = '';
+  for(let i=0;i<total;i++){
+    const dd = document.createElement('div');
+    dd.className = 'pdot ' + (i<itemIdx?'done':(i===itemIdx?'current':''));
+    prog.appendChild(dd);
+  }
+  const item = curFw.items[itemIdx];
+  document.getElementById('promptLabel').textContent = `문제 ${itemIdx+1} / ${total} · ${curFw.name}`;
+  const ptext = document.getElementById('promptText');
+  if(item.dir === 'rev'){
+    ptext.innerHTML = item.label;
+  } else {
+    ptext.textContent = item.prompt;
+  }
+
+  const optsBox = document.getElementById('opts');
+  optsBox.innerHTML='';
+  document.getElementById('fbBox').innerHTML='';
+  document.getElementById('nextBtn').disabled = true;
+  let firstTry = null;
+  let locked = false;
+
+  function recordFirstTry(val){
+    if(firstTryResults[itemIdx]===undefined){
+      firstTryResults[itemIdx]=val;
+      const fwIdx = frameworks.findIndex(f=>f.id===curFwId);
+      sessionStats[fwIdx].total++;
+      if(val) sessionStats[fwIdx].correct++;
+      renderStats();
+      saveStats();
+    }
+  }
+
+  item.opts.forEach(o=>{
+    const b = document.createElement('button');
+    b.className='opt';
+    b.textContent = o.t;
+    b.onclick = ()=>{
+      if(locked) return;
+      if(firstTry===null) firstTry = o.c;
+      if(o.c){
+        locked = true;
+        clearInterval(timerInterval);
+        b.classList.add('correct');
+        Array.from(optsBox.children).forEach(ch=>ch.disabled=true);
+        document.getElementById('fbBox').innerHTML = `<div class="feedback ok">✓ ${o.f}</div>`;
+        document.getElementById('nextBtn').disabled=false;
+        recordFirstTry(firstTry);
+        showFeedbackIcon(b, true);
+        playCorrectSound();
+      } else {
+        b.classList.add('wrong');
+        b.disabled=true;
+        document.getElementById('fbBox').innerHTML = `<div class="feedback bad">✗ ${o.f}</div>`;
+        showFeedbackIcon(b, false);
+        playWrongSound();
+      }
+    };
+    optsBox.appendChild(b);
+  });
+
+  startTimer(()=>{
+    if(locked) return;
+    locked = true;
+    const correctBtn = Array.from(optsBox.children).find((_,idx)=>item.opts[idx].c);
+    Array.from(optsBox.children).forEach(ch=>ch.disabled=true);
+    if(correctBtn) correctBtn.classList.add('correct');
+    const correctOpt = item.opts.find(o=>o.c);
+    document.getElementById('fbBox').innerHTML = `<div class="feedback bad">⏱ 시간 초과! 정답은 "${correctOpt.t}"입니다. ${correctOpt.f}</div>`;
+    document.getElementById('nextBtn').disabled=false;
+    recordFirstTry(false);
+    if(correctBtn) showFeedbackIcon(correctBtn, true);
+    playWrongSound();
+  });
+}
+
+function nextItem(){
+  if(itemIdx < curFw.items.length-1){
+    itemIdx++;
+    renderItem();
+  } else {
+    showSummary();
+  }
+}
+
+function showSummary(){
+  document.getElementById('itemScreen').classList.add('hidden');
+  document.getElementById('summaryScreen').classList.remove('hidden');
+  document.getElementById('sumTitle').textContent = `"${curFw.name}" 결과`;
+  const rows = document.getElementById('sumRows');
+  rows.innerHTML='';
+  curFw.items.forEach((it,i)=>{
+    const ok = firstTryResults[i];
+    const r = document.createElement('div');
+    r.className='sumrow';
+    r.innerHTML = `<span>문항 ${i+1}</span><span class="mark ${ok?'ok':'bad'}">${ok?'✓ 한 번에 정답':'✗ 오답 경유'}</span>`;
+    rows.appendChild(r);
+  });
+}
+
+function renderStats(){
+  const grid = document.getElementById('statGrid');
+  grid.innerHTML='';
+  sessionStats.forEach((s,i)=>{
+    const pct = s.total? Math.round(100*s.correct/s.total) : null;
+    const cell = document.createElement('div');
+    cell.className='statcell';
+    cell.innerHTML = `<div class="n">${pct===null?'–':pct+'%'}</div><div class="l">${frameworks[i].id}. ${frameworks[i].name}</div>`;
+    grid.appendChild(cell);
+  });
+}
+
+renderTabs();
+renderStats();
+updateMuteBtn();
+</script>
+</body>
+</html>

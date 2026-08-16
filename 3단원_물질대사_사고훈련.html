@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>물질대사 · 사고 훈련</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#170D0A;
+    --ink:#F5ECE6;
+    --muted:#A88D80;
+    --good:#2A9D8F;
+    --good-soft:rgba(42,157,143,0.16);
+    --accent:#FFD166;
+    --accent-soft:rgba(255,209,102,0.14);
+    --bad:#E63946;
+    --bad-soft:rgba(230,57,70,0.14);
+    --point:#F2703C;
+    --card:#241611;
+    --border:#4A3226;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans KR', sans-serif;
+    padding:48px 28px 60px;
+  }
+  .wrap{max-width:680px;margin:0 auto;}
+  h1{
+    font-family:'IBM Plex Sans KR', sans-serif;
+    font-weight:700;
+    font-size: clamp(1.3rem, 4vw, 1.7rem);
+    line-height:1.4;
+    word-break:keep-all;
+    margin:0 0 10px;
+    color:var(--ink);
+  }
+  .sub{color:var(--muted);font-size:1.05rem;margin:0 0 26px;line-height:1.55;word-break:keep-all;}
+
+  .tabs{display:flex;flex-direction:column;gap:10px;margin-bottom:22px;}
+  .tab{
+    flex:1 1 auto;
+    min-width:120px;
+    background:var(--card);
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:13px 15px;
+    cursor:pointer;
+    text-align:left;
+  }
+  .tab:hover{border-color:var(--good);}
+  .tab.active{border-color:var(--good);background:var(--good-soft);}
+  .tab .name{font-size:0.88rem;font-weight:600;}
+
+  .hidden{display:none;}
+
+  .progress{display:flex;gap:6px;margin-bottom:14px;}
+  .pdot{width:22px;height:5px;border-radius:3px;background:var(--border);}
+  .pdot.done{background:var(--good);}
+  .pdot.current{background:var(--point);}
+
+  .specimen{
+    background:var(--card);
+    border:1.5px solid var(--border);
+    border-radius:14px;
+    padding:26px;
+    box-shadow:0 2px 0 var(--border);
+  }
+  .dirtag{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.68rem;
+    padding:3px 9px;
+    border-radius:20px;
+    margin-bottom:12px;
+    letter-spacing:0.03em;
+  }
+  .prompt-label{font-size:0.72rem;color:var(--accent);font-family:'IBM Plex Sans KR', sans-serif;font-weight:700;letter-spacing:0.02em;margin-bottom:6px;}
+  .prompt-text{font-size:1.05rem;line-height:1.6;margin:0 0 18px;}
+  .prompt-text .target{color:var(--good);font-weight:700;}
+
+  .opt{
+    display:block;width:100%;text-align:left;
+    background:#31201A;
+    border:1.3px solid var(--border);
+    color:var(--ink);
+    padding:14px 16px;
+    border-radius:9px;
+    margin-bottom:10px;
+    cursor:pointer;
+    font-size:0.93rem;
+    font-family:inherit;
+  }
+  .opt:hover:not(:disabled){border-color:var(--good);}
+  .opt.correct{border-color:var(--good);background:var(--good-soft);}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-soft);}
+  .opt{position:relative;overflow:visible;}
+  .fb-icon{
+    position:absolute;top:-9px;right:-9px;width:24px;height:24px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;
+    opacity:0;transform:scale(0.4);transition:opacity 0.16s ease,transform 0.16s ease;
+    pointer-events:none;box-shadow:0 2px 6px rgba(0,0,0,0.35);
+  }
+  .fb-icon.show{opacity:1;transform:scale(1);}
+  .fb-icon.ok{background:var(--good);color:#0A140D;}
+  .fb-icon.bad{background:var(--bad);color:#160707;}
+  .muteBtn{
+    background:none;border:1.3px solid var(--border);color:var(--muted);
+    width:40px;height:40px;min-width:40px;border-radius:50%;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:19px;
+    margin-left:8px;flex-shrink:0;
+  }
+  .muteBtn:hover{border-color:var(--point);color:var(--point);}
+  .opt:disabled{cursor:default;}
+
+  .feedback{
+    margin-top:8px;
+    padding:12px 14px;
+    border-radius:9px;
+    font-size:0.88rem;
+    line-height:1.55;
+    position:relative;
+  }
+  .feedback.ok{background:var(--good-soft);border:1px solid var(--good);color:#DFFCF5;}
+  .feedback.bad{background:var(--bad-soft);border:1px solid var(--bad);color:#FFE3E3;}
+
+  .navrow{display:flex;justify-content:flex-end;margin-top:16px;}
+  button.primary{
+    background:var(--good);color:#0B2420;border:none;
+    padding:10px 20px;border-radius:9px;font-weight:600;cursor:pointer;font-family:inherit;
+  }
+  button.primary:disabled{opacity:0.35;cursor:default;}
+  button.ghost{
+    background:none;border:1.3px solid var(--border);color:var(--muted);
+    padding:9px 16px;border-radius:9px;cursor:pointer;font-family:inherit;
+  }
+  .back{background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.85rem;margin-bottom:12px;font-family:inherit;padding:0;}
+  .back:hover{color:var(--good);}
+
+  .sumrow{display:flex;justify-content:space-between;align-items:center;padding:9px 4px;border-bottom:1px dashed var(--border);font-size:0.9rem;}
+  .sumrow:last-child{border-bottom:none;}
+  .mark{font-family:'IBM Plex Sans KR', sans-serif;font-weight:700;font-size:0.82rem;}
+  .mark.ok{color:var(--good);}
+  .mark.bad{color:var(--bad);}
+
+  .diffgaugebox{margin-top:10px;padding:6px 4px;}
+  .diffvalue{
+    font-family:'IBM Plex Mono',monospace;font-size:2.2rem;font-weight:700;
+    text-align:center;color:var(--point);margin-bottom:10px;transition:color .2s;
+  }
+  input[type=range]{
+    -webkit-appearance:none; appearance:none;
+    width:100%;height:8px;border-radius:5px;outline:none;cursor:pointer;
+    background:var(--border);
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;
+    width:24px;height:24px;border-radius:50%;
+    background:var(--ink);border:3px solid var(--point);
+    cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.4);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:24px;height:24px;border-radius:50%;
+    background:var(--ink);border:3px solid var(--point);
+    cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.4);
+  }
+  input[type=range]::-moz-range-track{height:8px;border-radius:5px;background:var(--border);}
+  .diffscale{display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);margin-top:6px;}
+  .difflabel{text-align:center;font-size:0.85rem;font-weight:700;color:var(--muted);margin-top:10px;}
+
+  .timerRow{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .timerBarTrack{flex:1;height:8px;border-radius:5px;background:var(--card);border:1px solid var(--border);overflow:hidden;}
+  .timerBarFill{height:100%;width:100%;background:var(--good);transition:width 1s linear, background-color .3s;}
+  .timerNum{font-family:'IBM Plex Mono',monospace;font-size:0.85rem;font-weight:600;color:var(--ink);min-width:34px;text-align:right;}
+
+  .statsbar{margin-top:30px;padding-top:16px;border-top:1px solid var(--border);}
+  .statsHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;}
+  .statsHeader h4{margin:0;}
+  .resetLink{
+    background:none;border:1px solid var(--border);color:var(--muted);
+    font-family:'IBM Plex Sans KR', sans-serif;font-size:0.72rem;
+    padding:4px 10px;border-radius:20px;cursor:pointer;flex-shrink:0;
+  }
+  .resetLink:hover{border-color:var(--bad);color:var(--bad);}
+  .statsbar h4{font-size:0.78rem;color:var(--muted);font-family:'IBM Plex Sans KR', sans-serif;font-weight:700;letter-spacing:0.02em;margin:0;}
+  .statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+  @media(max-width:520px){ .statgrid{grid-template-columns:repeat(2,1fr);} .tabs{flex-direction:column;} .tab{min-width:0;} }
+  .statcell{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 4px;text-align:center;}
+  .statcell .n{font-family:'IBM Plex Mono',monospace;font-size:0.95rem;font-weight:600;color:var(--good);}
+  .statcell .l{font-size:0.62rem;color:var(--muted);margin-top:3px;line-height:1.3;word-break:keep-all;padding:0 2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>물질대사 — 사고 훈련</h1>
+  <p class="sub">물질이 합성되고 분해되며 에너지가 오가는 흐름을, 단계별로 따라가며 익히는 연습이에요.</p>
+
+  <div class="tabs" id="tabBar"></div>
+
+  <div id="difficultyScreen" class="hidden">
+    <button class="back" onclick="goHome()">&larr; 주제 목록으로</button>
+    <div class="specimen">
+      <div class="prompt-label" id="diffTitle"></div>
+      <p class="prompt-text">한 문제당 제한 시간을 골라주세요. 시간이 다 되면 자동으로 오답 처리돼요.</p>
+      <div class="diffgaugebox">
+        <div class="diffvalue" id="diffValue">15초</div>
+        <input type="range" id="diffSlider" min="5" max="30" step="1" value="15" oninput="updateDiffDisplay()">
+        <div class="diffscale"><span>5초 (빠름)</span><span>30초 (여유)</span></div>
+        <div class="difflabel" id="diffLabel">보통 속도</div>
+        <button class="primary" style="margin-top:16px;width:100%;" onclick="confirmDifficulty()">이 시간으로 시작하기</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="itemScreen" class="hidden">
+    <button class="back" onclick="goHome()">&larr; 주제 목록으로</button>
+    <div class="progress" id="progress"></div>
+    <div class="timerRow">
+      <div class="timerBarTrack"><div class="timerBarFill" id="timerBarFill"></div></div>
+      <span class="timerNum" id="timerNum">--</span>
+      <button class="muteBtn" id="muteBtn" onclick="toggleMute()" aria-label="소리 켜기/끄기" type="button">🔊</button>
+    </div>
+    <div class="specimen">
+      <div class="prompt-label" id="promptLabel"></div>
+      <p class="prompt-text" id="promptText"></p>
+      <div id="opts"></div>
+      <div id="fbBox"></div>
+      <div class="navrow">
+        <button class="primary" id="nextBtn" disabled onclick="nextItem()">다음 →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="summaryScreen" class="hidden">
+    <button class="back" onclick="goHome()">&larr; 주제 목록으로</button>
+    <div class="specimen">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--point);margin-bottom:8px;">RESULT</div>
+      <div id="sumTitle" style="font-size:1.05rem;font-weight:700;margin-bottom:10px;"></div>
+      <div id="sumRows"></div>
+      <div class="navrow" style="justify-content:space-between;">
+        <button class="ghost" onclick="openDifficultyScreen(curFwId)">다시 풀기</button>
+        <button class="primary" onclick="goHome()">다른 주제 풀기</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="statsbar">
+    <div class="statsHeader">
+      <h4>학습 현황 · 주제별 한 번에 맞힌 문제 비율</h4>
+      <button class="resetLink" onclick="resetStats()">기록 초기화</button>
+    </div>
+    <div class="statgrid" id="statGrid"></div>
+  </div>
+</div>
+
+<script>
+const frameworks = [
+  {
+    "id": "A",
+    "code": "[12세포02-01]",
+    "name": "물질대사와 에너지",
+    "items": [
+      {
+        "dir": "fwd",
+        "prompt": "상처 부위의 피부세포가 아미노산을 연결해 콜라겐을 새로 만들어 낸다.",
+        "opts": [
+          {
+            "t": "동화작용",
+            "c": true,
+            "f": "작고 단순한 물질(아미노산)을 연결해 크고 복잡한 물질(콜라겐)을 만드는 과정이므로 동화작용입니다."
+          },
+          {
+            "t": "이화작용",
+            "c": false,
+            "f": "이화작용은 크고 복잡한 물질을 작은 물질로 나누는 과정인데, 이 예시는 작은 물질을 연결해 큰 물질을 만드는 과정이므로 동화작용입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "식물의 뿌리세포가 흡수한 질산 이온을 재료로 삼아 새로운 아미노산을 만들어 낸다.",
+        "opts": [
+          {
+            "t": "동화작용",
+            "c": true,
+            "f": "간단한 물질(질산 이온)을 재료로 더 복잡한 물질(아미노산)을 만드는 과정이므로 동화작용입니다."
+          },
+          {
+            "t": "이화작용",
+            "c": false,
+            "f": "이화작용은 복잡한 물질을 간단한 물질로 나누는 과정인데, 이 예시는 반대로 새로운 물질을 만드는 과정이므로 동화작용입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">동화작용</span>에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "간세포가 아미노산을 연결해 혈장 단백질(알부민)을 만들어 낸다",
+            "c": true,
+            "f": "작은 물질을 연결해 크고 복잡한 물질(혈장 단백질)을 만드는 것은 동화작용입니다."
+          },
+          {
+            "t": "근육 속 크레아틴인산이 끊어지며 ADP에 인산기를 전달해 ATP를 다시 만든다",
+            "c": false,
+            "f": "물질이 끊어지며 에너지를 내놓는 과정이므로 이화작용입니다."
+          },
+          {
+            "t": "지라에서 오래된 적혈구의 헤모글로빈이 여러 조각으로 나뉘어 빌리루빈이 생긴다",
+            "c": false,
+            "f": "큰 물질이 여러 조각으로 나뉘는 과정이므로 이화작용입니다."
+          },
+          {
+            "t": "간세포에서 알코올 탈수소효소의 작용으로 에탄올의 결합 구조가 바뀐다",
+            "c": false,
+            "f": "에탄올이 더 단순한 물질로 바뀌는 과정이므로 이화작용입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">동화작용</span>에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "지방세포가 지방산과 글리세롤을 서로 연결해 중성지방으로 저장한다",
+            "c": true,
+            "f": "작은 물질 두 종류를 연결해 크고 복잡한 물질(중성지방)을 만드는 것은 동화작용입니다."
+          },
+          {
+            "t": "근육세포가 격렬한 운동 중 포도당을 젖산으로 바꾸며 에너지를 얻는다",
+            "c": false,
+            "f": "큰 물질이 더 단순한 물질로 바뀌며 에너지를 얻는 과정이므로 이화작용입니다."
+          },
+          {
+            "t": "발효빵 반죽 속 효모가 포도당을 이산화 탄소와 에탄올로 바꾼다",
+            "c": false,
+            "f": "포도당이 더 단순한 물질들로 바뀌는 과정이므로 이화작용입니다."
+          },
+          {
+            "t": "세포핵 안에서 오래된 RNA가 뉴클레오타이드 단위로 끊어진다",
+            "c": false,
+            "f": "큰 물질이 작은 단위로 끊어지는 과정이므로 이화작용입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "공복 상태가 길어지자 지방세포에 저장돼 있던 중성지방이 지방산과 글리세롤로 나뉘었다.",
+        "opts": [
+          {
+            "t": "이화작용",
+            "c": true,
+            "f": "크고 복잡한 물질(중성지방)이 작은 물질들로 나뉘는 과정이므로 이화작용입니다."
+          },
+          {
+            "t": "동화작용",
+            "c": false,
+            "f": "동화작용은 작은 물질을 연결해 큰 물질을 만드는 과정인데, 이 예시는 반대로 큰 물질이 나뉘는 과정이므로 이화작용입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "이자에서 분비된 트립신의 작용으로 큰 단백질이 여러 개의 작은 펩타이드 조각으로 끊어진다.",
+        "opts": [
+          {
+            "t": "이화작용",
+            "c": true,
+            "f": "크고 복잡한 물질(단백질)이 작은 조각으로 끊어지는 과정이므로 이화작용입니다."
+          },
+          {
+            "t": "동화작용",
+            "c": false,
+            "f": "동화작용은 작은 물질을 연결해 큰 물질을 만드는 과정인데, 이 예시는 반대로 큰 물질이 끊어지는 과정이므로 이화작용입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">이화작용</span>에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "겨울잠을 준비하는 동물이 저장된 지방을 여러 조각으로 나눠 에너지를 얻는다",
+            "c": true,
+            "f": "크고 복잡한 물질(지방)이 작은 물질로 나뉘며 에너지를 내놓는 과정이므로 이화작용입니다."
+          },
+          {
+            "t": "오래 달린 후 회복기에 근육세포가 아미노산을 연결해 근육 단백질을 다시 채운다",
+            "c": false,
+            "f": "작은 물질을 연결해 큰 물질을 만드는 과정이므로 동화작용입니다."
+          },
+          {
+            "t": "뼈를 만드는 조골세포가 아미노산을 연결해 콜라겐 골기질 단백질을 만든다",
+            "c": false,
+            "f": "작은 물질을 연결해 큰 물질을 만드는 과정이므로 동화작용입니다."
+          },
+          {
+            "t": "세포핵 안에서 RNA 중합효소가 뉴클레오타이드를 연결해 새로운 RNA를 만든다",
+            "c": false,
+            "f": "작은 물질을 연결해 큰 물질을 만드는 과정이므로 동화작용입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">이화작용</span>에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "지라에서 수명이 다한 적혈구의 헤모글로빈이 여러 조각으로 나뉘어 빌리루빈이 생성된다",
+            "c": true,
+            "f": "크고 복잡한 물질(헤모글로빈)이 작은 물질로 나뉘는 과정이므로 이화작용입니다."
+          },
+          {
+            "t": "식물 뿌리세포가 흡수한 질산 이온을 이용해 새로운 아미노산을 만든다",
+            "c": false,
+            "f": "작은 물질을 재료로 새로운 물질을 만드는 과정이므로 동화작용입니다."
+          },
+          {
+            "t": "간세포가 아미노산을 연결해 혈장 단백질을 만든다",
+            "c": false,
+            "f": "작은 물질을 연결해 큰 물질을 만드는 과정이므로 동화작용입니다."
+          },
+          {
+            "t": "지방세포가 지방산과 글리세롤을 연결해 중성지방을 저장한다",
+            "c": false,
+            "f": "작은 물질을 연결해 큰 물질을 만드는 과정이므로 동화작용입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "포도당 여러 개가 서로 연결되어 글라이코젠이 되는 반응에서, 생성된 글라이코젠 전체가 지닌 화학 에너지는 반응 전 포도당들이 지녔던 화학 에너지의 합보다 크다.",
+        "opts": [
+          {
+            "t": "에너지 흡수",
+            "c": true,
+            "f": "생성물의 에너지가 반응물의 에너지보다 크다는 것은, 반응이 진행되며 에너지를 흡수해 물질에 저장했다는 의미입니다."
+          },
+          {
+            "t": "에너지 방출",
+            "c": false,
+            "f": "에너지 방출이라면 생성물의 에너지가 반응물보다 작아야 하는데, 이 반응은 반대로 생성물의 에너지가 더 크므로 에너지 흡수입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">에너지를 흡수하는 반응</span>에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "아미노산들이 서로 연결되어 하나의 폴리펩타이드가 되며, 생성물의 에너지가 반응물보다 커진다",
+            "c": true,
+            "f": "생성물의 에너지가 반응물보다 크므로, 그 차이만큼 에너지를 흡수한 반응입니다."
+          },
+          {
+            "t": "다당류가 여러 개의 단당류로 나뉘며 반응물의 에너지가 생성물보다 크다",
+            "c": false,
+            "f": "반응물의 에너지가 생성물보다 크다는 것은 그 차이만큼 에너지가 방출되었다는 의미입니다."
+          },
+          {
+            "t": "지방이 지방산과 글리세롤로 나뉘며 에너지가 방출된다",
+            "c": false,
+            "f": "에너지가 방출되는 반응이므로 에너지 흡수 반응이 아닙니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "글라이코젠 한 분자가 여러 개의 포도당으로 나뉘는 반응에서, 반응물인 글라이코젠이 지녔던 화학 에너지는 생성된 포도당들의 화학 에너지 합보다 크다.",
+        "opts": [
+          {
+            "t": "에너지 방출",
+            "c": true,
+            "f": "반응물의 에너지가 생성물의 에너지보다 크다는 것은, 그 차이만큼 에너지가 방출되었다는 의미입니다."
+          },
+          {
+            "t": "에너지 흡수",
+            "c": false,
+            "f": "에너지 흡수라면 생성물의 에너지가 반응물보다 커야 하는데, 이 반응은 반대로 반응물의 에너지가 더 크므로 에너지 방출입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">에너지를 방출하는 반응</span>에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "중성지방이 지방산과 글리세롤로 나뉘며, 반응물의 에너지가 생성물의 에너지 합보다 크다",
+            "c": true,
+            "f": "반응물의 에너지가 생성물보다 크므로, 그 차이만큼 에너지를 방출한 반응입니다."
+          },
+          {
+            "t": "이산화 탄소와 물이 결합해 포도당이 되며 생성물의 에너지가 반응물보다 커진다",
+            "c": false,
+            "f": "생성물의 에너지가 반응물보다 크다는 것은 그 차이만큼 에너지를 흡수했다는 의미입니다."
+          },
+          {
+            "t": "아미노산들이 연결되어 단백질이 되며 에너지를 흡수한다",
+            "c": false,
+            "f": "에너지를 흡수하는 반응이므로 에너지 방출 반응이 아닙니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "자고 있는 동안에도 심장이 멈추지 않고 온몸으로 혈액을 내보낸다.",
+        "opts": [
+          {
+            "t": "기초대사량",
+            "c": true,
+            "f": "잠든 상태에서도 계속되는 심장박동은 생명 현상을 유지하는 데 필요한 최소한의 에너지, 즉 기초대사량입니다."
+          },
+          {
+            "t": "활동대사량",
+            "c": false,
+            "f": "활동대사량은 기초대사량 외에 별도의 신체 활동에 필요한 에너지인데, 이 예시는 잠든 상태에서도 계속되는 심장박동이므로 기초대사량입니다."
+          },
+          {
+            "t": "음식물의 소화·흡수에 필요한 에너지양",
+            "c": false,
+            "f": "소화·흡수와 무관한 심장박동이므로 기초대사량입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "깊이 잠든 상태에서도 폐가 스스로 움직이며 숨을 들이쉬고 내쉰다.",
+        "opts": [
+          {
+            "t": "기초대사량",
+            "c": true,
+            "f": "잠든 상태에서도 계속되는 호흡 운동은 생명 현상을 유지하는 데 필요한 최소한의 에너지, 즉 기초대사량입니다."
+          },
+          {
+            "t": "활동대사량",
+            "c": false,
+            "f": "활동대사량은 별도의 신체 활동에 필요한 에너지인데, 이 예시는 잠든 상태에서도 계속되는 호흡이므로 기초대사량입니다."
+          },
+          {
+            "t": "음식물의 소화·흡수에 필요한 에너지양",
+            "c": false,
+            "f": "소화·흡수와 무관한 호흡 운동이므로 기초대사량입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">기초대사량</span>에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "가만히 있어도 체온을 일정하게 유지하기 위해 몸에서 계속 열을 만들어 낸다",
+            "c": true,
+            "f": "체온 유지처럼 생명 현상을 유지하는 데 필요한 최소한의 에너지는 기초대사량입니다."
+          },
+          {
+            "t": "쉬는 시간에 친구와 큰 소리로 이야기를 나눈다",
+            "c": false,
+            "f": "말하기 같은 별도의 신체 활동에 필요한 에너지이므로 활동대사량입니다."
+          },
+          {
+            "t": "저녁 식사 후 위와 장이 음식물을 소화하고 흡수하는 데 에너지를 쓴다",
+            "c": false,
+            "f": "음식물의 소화·흡수에 필요한 에너지양입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "친구와 함께 자전거를 타고 공원을 한 바퀴 돌았다.",
+        "opts": [
+          {
+            "t": "활동대사량",
+            "c": true,
+            "f": "기초대사량 외에 몸을 움직이는 활동을 하는 데 필요한 에너지이므로 활동대사량입니다."
+          },
+          {
+            "t": "기초대사량",
+            "c": false,
+            "f": "기초대사량은 가만히 있어도 필요한 최소한의 에너지인데, 이 예시는 자전거를 타는 능동적 활동이므로 활동대사량입니다."
+          },
+          {
+            "t": "음식물의 소화·흡수에 필요한 에너지양",
+            "c": false,
+            "f": "소화·흡수 에너지가 아니라 몸을 움직이는 활동에 쓰인 에너지이므로 활동대사량입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">활동대사량</span>에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "시험 기간 동안 책상에 앉아 문제집을 푸느라 오랫동안 집중했다",
+            "c": true,
+            "f": "공부와 같은 활동에 필요한 에너지이므로 활동대사량입니다."
+          },
+          {
+            "t": "저녁 식사 후 위와 장이 음식물을 소화하고 흡수하는 데 에너지를 썼다",
+            "c": false,
+            "f": "음식물의 소화·흡수에 필요한 에너지양입니다."
+          },
+          {
+            "t": "가만히 있어도 체온을 유지하기 위해 몸에서 계속 열을 만들어 낸다",
+            "c": false,
+            "f": "생명 현상을 유지하는 데 필요한 최소한의 에너지이므로 기초대사량입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "소장 벽의 세포가 흡수한 영양소를 혈관 쪽으로 능동수송하는 데 에너지를 썼다.",
+        "opts": [
+          {
+            "t": "음식물의 소화·흡수에 필요한 에너지양",
+            "c": true,
+            "f": "영양소를 흡수하는 과정에 쓰인 에너지이므로 음식물의 소화·흡수에 필요한 에너지양입니다."
+          },
+          {
+            "t": "기초대사량",
+            "c": false,
+            "f": "기초대사량에는 소화·흡수 에너지가 포함되지 않습니다."
+          },
+          {
+            "t": "활동대사량",
+            "c": false,
+            "f": "활동대사량은 운동이나 공부 같은 활동에 필요한 에너지인데, 이 예시는 영양소 흡수 활동이므로 음식물의 소화·흡수에 필요한 에너지양입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">음식물의 소화·흡수에 필요한 에너지양</span>에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "저녁 식사 후 위와 장이 음식물을 잘게 부수고 영양소를 흡수하는 데 에너지를 썼다",
+            "c": true,
+            "f": "음식물을 소화하고 흡수하는 과정에 쓰인 에너지입니다."
+          },
+          {
+            "t": "쉬는 시간에 친구와 큰 소리로 이야기를 나누었다",
+            "c": false,
+            "f": "말하기와 같은 신체 활동에 필요한 에너지이므로 활동대사량입니다."
+          },
+          {
+            "t": "가만히 있어도 체온을 유지하기 위해 몸에서 계속 열을 만들어 낸다",
+            "c": false,
+            "f": "생명 현상을 유지하는 데 필요한 최소한의 에너지이므로 기초대사량입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "몸을 구성하던 지방과 단백질이 줄어들며 에너지원으로 쓰이고 있는 학생은 며칠째 식사량을 크게 줄인 상태다.",
+        "opts": [
+          {
+            "t": "에너지 부족",
+            "c": true,
+            "f": "섭취량이 소비량보다 적어 몸의 지방·단백질을 에너지원으로 쓰는 상태이므로 에너지 부족입니다."
+          },
+          {
+            "t": "에너지 균형",
+            "c": false,
+            "f": "에너지 균형은 섭취량과 소비량이 비슷한 상태인데, 이 예시는 몸의 지방·단백질이 줄어드는 상태이므로 에너지 부족입니다."
+          },
+          {
+            "t": "에너지 과잉",
+            "c": false,
+            "f": "에너지 과잉은 남는 에너지가 지방으로 쌓이는 상태인데, 이 예시는 반대로 지방·단백질이 줄어드는 상태이므로 에너지 부족입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">에너지 부족</span> 상태에서 나타나는 현상에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "장기간 소비량보다 적게 먹은 사람에게서 성장 장애와 영양실조 증상이 나타났다",
+            "c": true,
+            "f": "섭취량이 소비량보다 부족한 상태가 지속되면 성장 장애, 영양실조가 나타날 수 있습니다."
+          },
+          {
+            "t": "남은 에너지가 지방으로 축적되어 체중이 늘었다",
+            "c": false,
+            "f": "에너지 과잉 상태의 현상입니다."
+          },
+          {
+            "t": "섭취량과 소비량이 비슷해 체중에 큰 변화가 없었다",
+            "c": false,
+            "f": "에너지 균형 상태의 현상입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "규칙적으로 식사하고 운동한 사람의 체중이 몇 달째 일정하게 유지되었다.",
+        "opts": [
+          {
+            "t": "에너지 균형",
+            "c": true,
+            "f": "섭취량과 소비량의 균형이 이루어져 체중이 일정하게 유지되는 상태이므로 에너지 균형입니다."
+          },
+          {
+            "t": "에너지 부족",
+            "c": false,
+            "f": "에너지 부족 상태라면 체중 감소가 나타나는데, 이 예시는 체중이 유지되는 상태이므로 에너지 균형입니다."
+          },
+          {
+            "t": "에너지 과잉",
+            "c": false,
+            "f": "에너지 과잉 상태라면 체중 증가가 나타나는데, 이 예시는 체중이 유지되는 상태이므로 에너지 균형입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">에너지 균형</span> 상태에서 나타나는 현상에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "한 달간 매일 섭취한 에너지양과 소비한 에너지양이 거의 같아 체중 변화가 거의 없었다",
+            "c": true,
+            "f": "섭취량과 소비량이 비슷해 체중 변화가 거의 없는 상태이므로 에너지 균형입니다."
+          },
+          {
+            "t": "고칼로리 음식을 자주 먹으면서 활동량은 그대로여서 체지방이 계속 늘었다",
+            "c": false,
+            "f": "에너지 과잉 상태의 현상입니다."
+          },
+          {
+            "t": "식사량을 크게 줄인 이후 몸이 저장된 지방과 단백질을 에너지원으로 쓰기 시작했다",
+            "c": false,
+            "f": "에너지 부족 상태의 현상입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "야식을 즐기며 운동을 하지 않은 결과 남은 에너지가 지방으로 축적되어 체중이 늘었다.",
+        "opts": [
+          {
+            "t": "에너지 과잉",
+            "c": true,
+            "f": "섭취량이 소비량보다 많아 남은 에너지가 지방으로 축적되는 상태이므로 에너지 과잉입니다."
+          },
+          {
+            "t": "에너지 균형",
+            "c": false,
+            "f": "에너지 균형은 섭취량과 소비량이 같은 상태인데, 이 예시는 지방이 축적되어 체중이 느는 상태이므로 에너지 과잉입니다."
+          },
+          {
+            "t": "에너지 부족",
+            "c": false,
+            "f": "에너지 부족은 섭취량이 소비량보다 적은 상태인데, 이 예시는 반대로 남는 에너지가 쌓이는 상태이므로 에너지 과잉입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">에너지 과잉</span> 상태에서 나타나는 현상에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "고칼로리 음식을 자주 먹으면서 활동량은 그대로인 사람의 체지방이 계속 늘고 있다",
+            "c": true,
+            "f": "섭취량은 늘었는데 소비량은 그대로여서 남는 에너지가 체지방으로 쌓이는 상태이므로 에너지 과잉입니다."
+          },
+          {
+            "t": "장기간 소비량보다 적게 먹어 성장 장애가 나타났다",
+            "c": false,
+            "f": "에너지 부족 상태의 현상입니다."
+          },
+          {
+            "t": "섭취량과 소비량이 균형을 이뤄 체중이 유지됐다",
+            "c": false,
+            "f": "에너지 균형 상태의 현상입니다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "B",
+    "code": "[12세포02-02]",
+    "name": "생명활동과 ATP",
+    "items": [
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">광합성</span>에서 일어나는 물질 변화로 옳은 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "엽록체에서 빛에너지를 이용해 이산화 탄소와 물로 포도당을 만든다",
+            "c": true,
+            "f": "엽록체에서 빛에너지를 이용해 이산화 탄소와 물을 원료로 포도당을 만드는 과정이 광합성입니다."
+          },
+          {
+            "t": "미토콘드리아에서 포도당을 분해해 이산화 탄소와 물을 만들며 에너지를 방출한다",
+            "c": false,
+            "f": "이건 세포호흡의 물질 변화입니다."
+          },
+          {
+            "t": "ADP와 무기인산이 결합해 ATP가 만들어진다",
+            "c": false,
+            "f": "이건 ATP 합성 반응이며, 광합성의 물질 변화 자체는 아닙니다."
+          },
+          {
+            "t": "단백질이 여러 개의 아미노산으로 나뉜다",
+            "c": false,
+            "f": "이건 단백질의 이화작용이며, 광합성의 물질 변화가 아닙니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">세포호흡</span>에서 일어나는 물질 변화로 옳은 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "미토콘드리아에서 포도당을 분해해 이산화 탄소와 물을 만들며 에너지를 방출한다",
+            "c": true,
+            "f": "포도당을 분해해 이산화 탄소와 물로 만들며 에너지를 방출하는 과정이 세포호흡입니다."
+          },
+          {
+            "t": "엽록체에서 빛에너지를 이용해 이산화 탄소와 물로 포도당을 만든다",
+            "c": false,
+            "f": "이건 광합성의 물질 변화입니다."
+          },
+          {
+            "t": "질산 이온을 재료로 아미노산을 새로 만든다",
+            "c": false,
+            "f": "이건 물질을 합성하는 동화작용이며, 세포호흡과는 다른 반응입니다."
+          },
+          {
+            "t": "ATP가 ADP와 무기인산으로 나뉘며 에너지가 방출된다",
+            "c": false,
+            "f": "이건 ATP의 분해 반응이며, 세포호흡 자체의 물질 변화는 아닙니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "이 과정에서 빛에너지가 유기물의 화학 에너지로 전환된다.",
+        "opts": [
+          {
+            "t": "광합성",
+            "c": true,
+            "f": "빛에너지가 포도당 같은 유기물의 화학 에너지로 전환되는 과정은 광합성입니다."
+          },
+          {
+            "t": "세포호흡",
+            "c": false,
+            "f": "세포호흡에서는 빛에너지가 아니라 포도당의 화학 에너지가 ATP의 화학 에너지 등으로 전환되므로 이 설명은 광합성입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 이화작용에 해당하며 발열 반응인 <span class=\"target\">세포호흡</span>에 대한 설명으로 옳은 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "크고 복잡한 물질인 포도당을 분해해 에너지를 방출하는 반응이다",
+            "c": true,
+            "f": "세포호흡은 포도당을 분해하며 에너지를 방출하는 이화작용이자 발열 반응입니다."
+          },
+          {
+            "t": "이산화 탄소와 물을 원료로 유기물을 합성하며 에너지를 흡수하는 반응이다",
+            "c": false,
+            "f": "이건 동화작용이자 흡열 반응인 광합성에 대한 설명입니다."
+          },
+          {
+            "t": "빛에너지를 직접 이용해 물질을 만드는 반응이다",
+            "c": false,
+            "f": "빛에너지를 직접 이용하는 것은 광합성이며, 세포호흡은 포도당의 화학 에너지를 이용합니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 동화작용에 해당하며 흡열 반응인 <span class=\"target\">광합성</span>에 대한 설명으로 옳은 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "빛에너지를 흡수해 작고 단순한 물질로 크고 복잡한 유기물을 만드는 반응이다",
+            "c": true,
+            "f": "광합성은 빛에너지를 흡수해 이산화 탄소와 물로 포도당을 만드는 동화작용이자 흡열 반응입니다."
+          },
+          {
+            "t": "유기물을 분해해 에너지를 방출하는 반응이다",
+            "c": false,
+            "f": "이건 이화작용이자 발열 반응인 세포호흡에 대한 설명입니다."
+          },
+          {
+            "t": "산소를 소비하고 이산화 탄소를 방출하는 반응이다",
+            "c": false,
+            "f": "이건 세포호흡의 기체 출입입니다. 광합성은 반대로 이산화 탄소를 소비하고 산소를 방출합니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "이 과정에서 방출된 에너지의 일부는 ATP에 저장되고 나머지는 열로 방출된다.",
+        "opts": [
+          {
+            "t": "세포호흡",
+            "c": true,
+            "f": "포도당의 화학 에너지 중 일부만 ATP에 저장되고 나머지는 열로 방출되는 것은 세포호흡의 특징입니다."
+          },
+          {
+            "t": "광합성",
+            "c": false,
+            "f": "광합성은 에너지를 방출하는 과정이 아니라 흡수해 저장하는 과정이므로 이 설명은 세포호흡입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "엽록체에서 일어나며 빛에너지를 화학 에너지로 전환한다",
+            "c": true,
+            "f": "엽록체에서 빛에너지를 유기물의 화학 에너지로 전환하는 것은 광합성의 특징입니다."
+          },
+          {
+            "t": "미토콘드리아와 세포질에서 일어난다",
+            "c": false,
+            "f": "이건 세포호흡이 일어나는 장소입니다."
+          },
+          {
+            "t": "포도당을 분해해 에너지를 방출하는 이화작용이다",
+            "c": false,
+            "f": "이건 세포호흡의 특징입니다."
+          },
+          {
+            "t": "산소를 소비하고 이산화 탄소를 방출한다",
+            "c": false,
+            "f": "이건 세포호흡의 기체 출입입니다. 광합성은 반대로 이산화 탄소를 소비하고 산소를 방출합니다."
+          }
+        ],
+        "label": "다음 중 <span class=\"target\">광합성</span>에 대한 설명으로 옳은 것을 고르시오."
+      },
+      {
+        "dir": "rev",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "산소를 소비해 포도당을 분해하고 이산화 탄소와 물을 방출하는 이화작용이다",
+            "c": true,
+            "f": "포도당을 분해해 에너지를 얻는 이화작용은 세포호흡의 특징입니다."
+          },
+          {
+            "t": "이산화 탄소와 물을 원료로 포도당을 합성하는 동화작용이다",
+            "c": false,
+            "f": "이건 광합성의 특징입니다."
+          },
+          {
+            "t": "빛에너지를 직접 이용해 반응이 일어난다",
+            "c": false,
+            "f": "이건 광합성의 특징입니다. 세포호흡은 빛에너지가 아니라 포도당의 화학 에너지를 이용합니다."
+          },
+          {
+            "t": "엽록체에서 일어난다",
+            "c": false,
+            "f": "이건 광합성이 일어나는 장소입니다. 세포호흡은 미토콘드리아와 세포질에서 일어납니다."
+          }
+        ],
+        "label": "다음 중 <span class=\"target\">세포호흡</span>에 대한 설명으로 옳은 것을 고르시오."
+      },
+      {
+        "dir": "fwd",
+        "prompt": "태양의 빛에너지는 광합성을 거쳐 포도당의 화학 에너지로 저장되었다가, 세포호흡을 통해 ATP의 화학 에너지로 전환되어 생명활동에 쓰인다.",
+        "opts": [
+          {
+            "t": "참",
+            "c": true,
+            "f": "빛에너지 → 포도당의 화학 에너지(광합성) → ATP의 화학 에너지(세포호흡) → 생명활동으로 이어지는 에너지 전환 순서는 옳은 설명입니다."
+          },
+          {
+            "t": "거짓",
+            "c": false,
+            "f": "이 설명은 광합성과 세포호흡을 통한 에너지 전환의 순서를 정확히 나타낸 옳은 설명입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "세포호흡 과정에서 방출된 에너지는 전부 ATP에 저장되어 손실 없이 이용된다.",
+        "opts": [
+          {
+            "t": "거짓",
+            "c": true,
+            "f": "세포호흡으로 방출된 에너지 중 일부만 ATP에 저장되고 나머지는 열에너지 등으로 방출되므로 거짓입니다."
+          },
+          {
+            "t": "참",
+            "c": false,
+            "f": "세포호흡에서 방출된 에너지가 모두 ATP에 저장되는 것은 아닙니다. 일부는 열로 방출되므로 거짓입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "식물의 잎 세포에서는 낮 동안 광합성만 일어나고 세포호흡은 일어나지 않는다.",
+        "opts": [
+          {
+            "t": "거짓",
+            "c": true,
+            "f": "식물 세포에서는 낮에도 세포호흡이 계속 일어나며, 광합성과 세포호흡이 동시에 일어납니다."
+          },
+          {
+            "t": "참",
+            "c": false,
+            "f": "식물 세포는 낮에도 생명활동을 위한 세포호흡을 계속하므로, 광합성만 일어난다는 설명은 거짓입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "생명 활동에 필요한 에너지의 근원은 태양의 빛에너지이다.",
+        "opts": [
+          {
+            "t": "참",
+            "c": true,
+            "f": "태양의 빛에너지가 광합성을 거쳐 유기물의 화학 에너지로 저장되고, 이는 세포호흡을 통해 생명활동에 쓰이므로 옳은 설명입니다."
+          },
+          {
+            "t": "거짓",
+            "c": false,
+            "f": "생명 활동에 이용되는 에너지의 근원은 태양의 빛에너지가 맞으므로 이 설명은 참입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "밀폐 용기에 물을 주어 싹을 틔운 콩을 넣었더니, 물기 없이 마른 채로 둔 콩을 넣은 용기보다 이산화 탄소 농도와 온도가 뚜렷하게 더 높게 측정되었다.",
+        "opts": [
+          {
+            "t": "참",
+            "c": true,
+            "f": "싹을 틔운 콩은 세포호흡이 활발해 이산화 탄소와 열을 많이 방출하므로, 마른 콩을 넣은 용기보다 변화가 크게 나타난다는 설명은 옳습니다."
+          },
+          {
+            "t": "거짓",
+            "c": false,
+            "f": "싹을 틔운 콩은 세포호흡이 활발해 마른 콩보다 이산화 탄소 농도와 온도 변화가 크게 나타나므로 이 설명은 참입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "물기 없이 마른 채로 둔 콩을 넣은 용기에서는 시간이 지나도 이산화 탄소 농도와 온도에 거의 변화가 없었다.",
+        "opts": [
+          {
+            "t": "참",
+            "c": true,
+            "f": "마른 콩은 세포호흡이 거의 일어나지 않아 이산화 탄소 농도와 온도가 거의 변하지 않으므로 옳은 설명입니다."
+          },
+          {
+            "t": "거짓",
+            "c": false,
+            "f": "마른 콩은 세포호흡이 거의 일어나지 않으므로 변화가 거의 없다는 이 설명은 참입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "콩을 뜨거운 물에 삶으면 세포호흡에 관여하는 효소의 기능이 사라져, 삶은 콩을 넣은 밀폐 용기에서는 시간이 지나도 이산화 탄소 농도와 온도가 거의 변하지 않는다.",
+        "opts": [
+          {
+            "t": "참",
+            "c": true,
+            "f": "효소는 단백질로 이루어져 있어 높은 온도에서 변성되면 기능을 잃습니다. 효소가 변성된 삶은 콩은 세포호흡이 거의 일어나지 않으므로 이 설명은 참입니다."
+          },
+          {
+            "t": "거짓",
+            "c": false,
+            "f": "삶은 콩은 열로 인해 효소가 변성되어 세포호흡이 거의 일어나지 않으므로, 이 설명은 참입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "발아 중인 콩에서는 세포호흡이 활발히 일어나 이산화 탄소 농도와 온도가 크게 증가한다",
+            "c": true,
+            "f": "발아 중인 콩은 세포호흡이 활발해 이산화 탄소와 열을 많이 방출합니다."
+          },
+          {
+            "t": "마른 콩에서 이산화 탄소 농도와 온도가 크게 증가한다",
+            "c": false,
+            "f": "마른 콩은 세포호흡이 거의 일어나지 않아 변화가 거의 없습니다."
+          },
+          {
+            "t": "두 콩 모두 이산화 탄소 농도와 온도에 변화가 거의 나타나지 않는다",
+            "c": false,
+            "f": "발아 중인 콩에서는 세포호흡으로 뚜렷한 변화가 나타납니다."
+          },
+          {
+            "t": "발아 중인 콩에서 광합성이 활발히 일어나 산소 농도가 증가한다",
+            "c": false,
+            "f": "이 탐구는 빛이 없는 밀폐 챔버에서 세포호흡을 관찰하는 실험으로, 광합성과는 관련이 없습니다."
+          }
+        ],
+        "label": "다음 중 발아 중인 콩과 마른 콩을 이용한 물질대사 탐구 결과로 옳은 것을 고르시오."
+      },
+      {
+        "dir": "fwd",
+        "prompt": "이 물질은 아데닌과 라이보스가 결합한 아데노신에 인산기 3개가 결합한 구조이다.",
+        "opts": [
+          {
+            "t": "ATP",
+            "c": true,
+            "f": "아데노신에 인산기 3개가 결합한 구조는 ATP입니다."
+          },
+          {
+            "t": "ADP",
+            "c": false,
+            "f": "ADP는 아데노신에 인산기 2개가 결합한 구조인데, 이 설명은 인산기 3개이므로 ATP입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "이 물질은 아데노신에 인산기 2개가 결합한 구조이다.",
+        "opts": [
+          {
+            "t": "ADP",
+            "c": true,
+            "f": "아데노신에 인산기 2개가 결합한 구조는 ADP입니다."
+          },
+          {
+            "t": "ATP",
+            "c": false,
+            "f": "ATP는 인산기 3개가 결합한 구조인데, 이 설명은 인산기 2개이므로 ADP입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">ATP</span>가 분해될 때 나타나는 현상으로 옳은 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "인산기 1개가 떨어져 나가면서 에너지가 방출된다",
+            "c": true,
+            "f": "ATP가 ADP와 무기인산으로 나뉘며 고에너지 인산 결합이 끊어져 에너지가 방출됩니다."
+          },
+          {
+            "t": "무기인산과 결합하며 에너지를 흡수한다",
+            "c": false,
+            "f": "이건 ADP가 ATP로 될 때 일어나는 현상입니다."
+          },
+          {
+            "t": "아미노산이 연결되며 에너지를 흡수한다",
+            "c": false,
+            "f": "이건 단백질 합성 반응이며, ATP의 분해와는 다른 반응입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">ATP</span>가 만들어지는 과정에 대한 설명으로 옳은 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "세포호흡으로 방출된 에너지를 흡수해 ADP와 무기인산이 결합하며 만들어진다",
+            "c": true,
+            "f": "ADP와 무기인산이 에너지를 흡수해 결합하면 ATP가 만들어집니다."
+          },
+          {
+            "t": "인산기 1개가 떨어져 나가며 만들어진다",
+            "c": false,
+            "f": "인산기가 떨어져 나가는 것은 ATP가 ADP로 분해되는 과정입니다."
+          },
+          {
+            "t": "빛에너지를 직접 흡수해 만들어진다",
+            "c": false,
+            "f": "ATP는 빛에너지가 아니라 세포호흡으로 방출된 화학 에너지를 흡수해 만들어집니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "ATP에서 인산기와 인산기 사이의 고에너지 인산 결합이 끊어질 때 나타나는 현상이다.",
+        "opts": [
+          {
+            "t": "에너지 방출",
+            "c": true,
+            "f": "고에너지 인산 결합이 끊어지면서 약 7.3 kcal/mol의 에너지가 방출됩니다."
+          },
+          {
+            "t": "에너지 흡수",
+            "c": false,
+            "f": "결합이 끊어질 때는 에너지가 흡수되는 것이 아니라 방출됩니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "ADP와 무기인산이 결합해 ATP가 될 때 나타나는 현상이다.",
+        "opts": [
+          {
+            "t": "에너지 흡수",
+            "c": true,
+            "f": "ADP와 무기인산이 결합해 고에너지 인산 결합이 새로 생기려면 에너지를 흡수해야 합니다."
+          },
+          {
+            "t": "에너지 방출",
+            "c": false,
+            "f": "ADP와 무기인산이 결합할 때는 에너지가 방출되는 것이 아니라 흡수됩니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "아데닌, 라이보스, 인산기 3개로 이루어져 있다",
+            "c": true,
+            "f": "ATP는 아데닌과 라이보스가 결합한 아데노신에 인산기 3개가 결합한 구조입니다."
+          },
+          {
+            "t": "아데닌, 디옥시라이보스, 인산기 3개로 이루어져 있다",
+            "c": false,
+            "f": "디옥시라이보스는 DNA를 구성하는 당입니다. ATP는 라이보스로 이루어져 있습니다."
+          },
+          {
+            "t": "아데노신에 인산기 2개가 결합한 구조이다",
+            "c": false,
+            "f": "이건 ADP의 구조입니다."
+          },
+          {
+            "t": "포도당 1분자와 인산기가 결합한 구조이다",
+            "c": false,
+            "f": "ATP는 포도당이 아니라 아데노신에 인산기가 결합한 구조입니다."
+          }
+        ],
+        "label": "다음 중 <span class=\"target\">ATP의 구조</span>에 대한 설명으로 옳은 것을 고르시오."
+      },
+      {
+        "dir": "rev",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "ATP가 ADP와 무기인산으로 분해될 때 약 7.3 kcal/mol의 에너지가 방출된다",
+            "c": true,
+            "f": "ATP의 고에너지 인산 결합이 끊어질 때 약 7.3 kcal/mol의 에너지가 방출됩니다."
+          },
+          {
+            "t": "ADP가 ATP로 될 때 에너지가 방출된다",
+            "c": false,
+            "f": "ADP가 ATP로 될 때는 에너지가 흡수됩니다."
+          },
+          {
+            "t": "ATP는 한 번 분해되면 다시 합성될 수 없다",
+            "c": false,
+            "f": "ADP와 무기인산은 세포호흡으로 방출된 에너지를 흡수해 다시 ATP로 재생될 수 있습니다."
+          },
+          {
+            "t": "ATP와 ADP 사이의 전환에는 에너지 출입이 일어나지 않는다",
+            "c": false,
+            "f": "ATP와 ADP 사이의 전환에는 반드시 에너지 출입이 함께 일어납니다."
+          }
+        ],
+        "label": "다음 중 <span class=\"target\">ATP와 ADP 사이의 전환</span>에 대한 설명으로 옳은 것을 고르시오."
+      },
+      {
+        "dir": "fwd",
+        "prompt": "간세포가 ATP를 사용해 아미노산을 사슬처럼 이어 붙여 혈장 단백질을 새로 만들어 낸다.",
+        "opts": [
+          {
+            "t": "물질 합성",
+            "c": true,
+            "f": "작은 물질을 결합해 더 큰 물질을 만드는 데 ATP가 쓰였으므로 물질 합성에 해당합니다."
+          },
+          {
+            "t": "능동수송",
+            "c": false,
+            "f": "능동수송은 물질을 막을 통해 이동시키는 것인데, 이 예시는 단백질을 합성하는 과정이므로 물질 합성입니다."
+          },
+          {
+            "t": "기계적인 활동",
+            "c": false,
+            "f": "기계적인 활동은 근육 수축 같은 움직임인데, 이 예시는 단백질을 합성하는 과정이므로 물질 합성입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 ATP가 <span class=\"target\">능동수송</span>에 이용되는 예에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "소장 상피세포가 농도가 낮은 쪽에서 높은 쪽으로 포도당을 흡수한다",
+            "c": true,
+            "f": "농도 기울기를 거슬러 물질을 이동시키는 데 ATP가 쓰였으므로 능동수송입니다."
+          },
+          {
+            "t": "간세포가 아미노산을 연결해 혈장 단백질을 만든다",
+            "c": false,
+            "f": "이건 물질 합성에 ATP가 이용되는 예입니다."
+          },
+          {
+            "t": "백혈구가 위족을 뻗어 세균을 감싸 삼킨다",
+            "c": false,
+            "f": "이건 기계적인 활동에 ATP가 이용되는 예입니다."
+          },
+          {
+            "t": "심장근육세포가 수축과 이완을 반복한다",
+            "c": false,
+            "f": "이건 기계적인 활동에 ATP가 이용되는 예입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "백혈구가 ATP를 사용해 위족을 뻗어 세균을 감싸 삼킨다.",
+        "opts": [
+          {
+            "t": "기계적인 활동",
+            "c": true,
+            "f": "위족을 뻗는 세포의 움직임에 ATP가 쓰였으므로 기계적인 활동에 해당합니다."
+          },
+          {
+            "t": "물질 합성",
+            "c": false,
+            "f": "물질 합성은 물질을 결합해 만드는 과정인데, 이 예시는 세포가 형태를 바꾸며 움직이는 과정이므로 기계적인 활동입니다."
+          },
+          {
+            "t": "능동수송",
+            "c": false,
+            "f": "능동수송은 특정 물질을 막을 통해 이동시키는 것인데, 이 예시는 세포 전체가 움직이는 과정이므로 기계적인 활동입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "신장 세뇨관 세포가 ATP를 사용해 나트륨 이온을 혈액 쪽으로 다시 흡수한다.",
+        "opts": [
+          {
+            "t": "능동수송",
+            "c": true,
+            "f": "농도 기울기를 거슬러 나트륨 이온을 이동시키는 데 ATP가 쓰였으므로 능동수송에 해당합니다."
+          },
+          {
+            "t": "기계적인 활동",
+            "c": false,
+            "f": "기계적인 활동은 근육 수축 같은 움직임인데, 이 예시는 이온을 이동시키는 과정이므로 능동수송입니다."
+          },
+          {
+            "t": "물질 합성",
+            "c": false,
+            "f": "물질 합성은 물질을 결합해 만드는 과정인데, 이 예시는 이온을 이동시키는 과정이므로 능동수송입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 ATP가 <span class=\"target\">기계적인 활동</span>에 이용되는 예에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "심장근육세포가 수축과 이완을 반복하며 혈액을 내보낸다",
+            "c": true,
+            "f": "근육의 수축·이완과 같은 기계적인 움직임에 ATP가 쓰였습니다."
+          },
+          {
+            "t": "소장 상피세포가 포도당을 농도가 낮은 쪽에서 높은 쪽으로 흡수한다",
+            "c": false,
+            "f": "이건 능동수송에 ATP가 이용되는 예입니다."
+          },
+          {
+            "t": "간세포가 아미노산을 연결해 혈장 단백질을 만든다",
+            "c": false,
+            "f": "이건 물질 합성에 ATP가 이용되는 예입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "근육세포가 ATP를 사용해 아미노산을 사슬처럼 연결해 근육 단백질을 새로 만들어 낸다.",
+        "opts": [
+          {
+            "t": "물질 합성",
+            "c": true,
+            "f": "작은 물질을 결합해 더 큰 물질을 만드는 데 ATP가 쓰였으므로 물질 합성에 해당합니다."
+          },
+          {
+            "t": "기계적인 활동",
+            "c": false,
+            "f": "기계적인 활동은 근육 수축 같은 움직임인데, 이 예시는 단백질을 합성하는 과정이므로 물질 합성입니다."
+          },
+          {
+            "t": "능동수송",
+            "c": false,
+            "f": "능동수송은 물질을 막을 통해 이동시키는 것인데, 이 예시는 단백질을 합성하는 과정이므로 물질 합성입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "혈액 쪽으로 나트륨 이온을 되돌리기 위해 신장 세뇨관 세포가 ATP의 에너지를 사용하는 과정이다",
+            "c": true,
+            "f": "농도 기울기를 거슬러 이온을 이동시키기 위해 세포가 ATP의 에너지를 소모하는 것은 능동수송의 예입니다."
+          },
+          {
+            "t": "백혈구가 위족을 뻗어 세균을 삼킨다",
+            "c": false,
+            "f": "이건 기계적인 활동의 예입니다."
+          },
+          {
+            "t": "간세포가 아미노산을 연결해 단백질을 합성한다",
+            "c": false,
+            "f": "이건 물질 합성의 예입니다."
+          },
+          {
+            "t": "심장근육세포가 수축과 이완을 반복한다",
+            "c": false,
+            "f": "이건 기계적인 활동의 예입니다."
+          }
+        ],
+        "label": "다음 중 ATP가 <span class=\"target\">능동수송</span>에 이용되는 예에 해당하는 것을 고르시오."
+      },
+      {
+        "dir": "rev",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "근육세포가 아미노산을 연결하여 근육 단백질을 합성한다",
+            "c": true,
+            "f": "작은 물질을 결합해 큰 물질을 만드는 것은 물질 합성의 예입니다."
+          },
+          {
+            "t": "소장 상피세포가 포도당을 능동수송으로 흡수한다",
+            "c": false,
+            "f": "이건 능동수송의 예입니다."
+          },
+          {
+            "t": "백혈구가 위족을 뻗어 세균을 삼킨다",
+            "c": false,
+            "f": "이건 기계적인 활동의 예입니다."
+          },
+          {
+            "t": "심장근육세포가 수축한다",
+            "c": false,
+            "f": "이건 기계적인 활동의 예입니다."
+          }
+        ],
+        "label": "다음 중 ATP가 <span class=\"target\">물질 합성</span>에 이용되는 예에 해당하는 것을 고르시오."
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">ADP의 구조</span>에 대한 설명으로 옳은 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "아데노신에 인산기 2개가 결합한 구조이다",
+            "c": true,
+            "f": "ADP는 아데닌과 라이보스가 결합한 아데노신에 인산기 2개가 결합한 구조입니다."
+          },
+          {
+            "t": "아데닌, 라이보스, 인산기 3개로 이루어져 있다",
+            "c": false,
+            "f": "이건 ATP의 구조입니다."
+          },
+          {
+            "t": "포도당 1분자에 인산기가 결합한 구조이다",
+            "c": false,
+            "f": "ADP는 포도당이 아니라 아데노신에 인산기가 결합한 구조입니다."
+          },
+          {
+            "t": "디옥시라이보스를 포함한 구조이다",
+            "c": false,
+            "f": "디옥시라이보스는 DNA를 구성하는 당입니다. ADP는 라이보스로 이루어져 있습니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "세포호흡으로 포도당이 분해되며 방출된 에너지 중 일부가 ADP와 무기인산의 결합에 쓰였다.",
+        "opts": [
+          {
+            "t": "에너지 흡수",
+            "c": true,
+            "f": "ADP와 무기인산이 결합해 ATP가 되려면 에너지를 흡수해야 하므로, 세포호흡에서 방출된 에너지 일부가 이 결합에 흡수된 것입니다."
+          },
+          {
+            "t": "에너지 방출",
+            "c": false,
+            "f": "에너지가 방출되는 쪽은 ATP가 ADP와 무기인산으로 나뉠 때입니다. ADP와 무기인산이 결합할 때는 에너지를 흡수합니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "위(胃) 벽세포가 ATP를 사용해 수소 이온을 농도가 낮은 세포 안쪽에서 농도가 높은 위 안쪽 공간으로 이동시켜 위산을 분비한다.",
+        "opts": [
+          {
+            "t": "능동수송",
+            "c": true,
+            "f": "ATP를 사용해 이온을 농도가 낮은 쪽에서 높은 쪽으로 이동시키는 과정이므로 능동수송에 해당합니다."
+          },
+          {
+            "t": "물질 합성",
+            "c": false,
+            "f": "물질 합성은 작은 물질을 연결해 큰 물질을 만드는 것인데, 이 예시는 이온을 이동시키는 과정이므로 능동수송입니다."
+          },
+          {
+            "t": "기계적인 활동",
+            "c": false,
+            "f": "기계적인 활동은 근육 수축 같은 움직임인데, 이 예시는 이온을 막 너머로 이동시키는 과정이므로 능동수송입니다."
+          }
+        ]
+      }
+    ]
+  }
+];
+
+let curFw = null;
+let curFwId = null;
+let pendingFwId = null;
+let itemIdx = 0;
+let firstTryResults = [];
+let roundSeconds = 20;
+let timerInterval = null;
+let lastRoundIndices = {}; // 주제별 직전 라운드에 출제된 문항 인덱스 (다시 풀기 시 겹치지 않게)
+
+const STATS_KEY = 'metabolism_unit3_stats_v1';
+
+function loadStats(){
+  try{
+    const raw = localStorage.getItem(STATS_KEY);
+    if(!raw) return frameworks.map(()=>({correct:0,total:0}));
+    const saved = JSON.parse(raw);
+    return frameworks.map(fw=>{
+      const found = saved && saved[fw.id];
+      return (found && typeof found.correct==='number' && typeof found.total==='number')
+        ? {correct: found.correct, total: found.total}
+        : {correct:0, total:0};
+    });
+  } catch(e){
+    return frameworks.map(()=>({correct:0,total:0}));
+  }
+}
+
+function saveStats(){
+  try{
+    const obj = {};
+    frameworks.forEach((fw,i)=>{ obj[fw.id] = sessionStats[i]; });
+    localStorage.setItem(STATS_KEY, JSON.stringify(obj));
+  } catch(e){
+    // 저장 실패(예: 프라이빗 모드)해도 학습 자체는 계속 진행되도록 조용히 무시
+  }
+}
+
+function resetStats(){
+  if(!confirm('지금까지 쌓인 학습 기록을 전부 초기화할까요? 되돌릴 수 없어요.')) return;
+  sessionStats = frameworks.map(()=>({correct:0,total:0}));
+  try{ localStorage.removeItem(STATS_KEY); } catch(e){}
+  renderStats();
+}
+
+let sessionStats = loadStats();
+
+function renderTabs(){
+  const bar = document.getElementById('tabBar');
+  bar.innerHTML = '';
+  frameworks.forEach(fw=>{
+    const d = document.createElement('div');
+    d.className = 'tab';
+    d.onclick = ()=>openDifficultyScreen(fw.id);
+    d.innerHTML = `<span class="name">${fw.name}</span>`;
+    bar.appendChild(d);
+  });
+}
+
+const ROUND_SIZE = {A:5, B:7};
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function openDifficultyScreen(id){
+  pendingFwId = id;
+  const fw = frameworks.find(f=>f.id===id);
+  document.getElementById('diffTitle').textContent = `${fw.name} · 시간 설정`;
+  document.getElementById('tabBar').classList.add('hidden');
+  document.getElementById('itemScreen').classList.add('hidden');
+  document.getElementById('summaryScreen').classList.add('hidden');
+  document.getElementById('difficultyScreen').classList.remove('hidden');
+  document.getElementById('diffSlider').value = 15;
+  updateDiffDisplay();
+}
+
+function updateDiffDisplay(){
+  const slider = document.getElementById('diffSlider');
+  const v = parseInt(slider.value, 10);
+  const pct = ((v - 5) / (30 - 5)) * 100;
+  let color, label;
+  if(v <= 10){ color = '#FF6B6B'; label = '빠른 판단 연습'; }
+  else if(v <= 20){ color = '#F2A65A'; label = '표준 속도'; }
+  else { color = '#4FD1B8'; label = '여유롭게 생각하기'; }
+  slider.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #30405A ${pct}%, #30405A 100%)`;
+  const valueEl = document.getElementById('diffValue');
+  valueEl.textContent = v + '초';
+  valueEl.style.color = color;
+  document.getElementById('diffLabel').textContent = label;
+}
+
+function confirmDifficulty(){
+  const v = parseInt(document.getElementById('diffSlider').value, 10);
+  startFramework(pendingFwId, v);
+}
+
+function itemTopic(item){
+  // 문항이 다루는 '소재'를 정답 카테고리(정방향) 또는 target 라벨(역방향)에서 추출
+  if(item.dir === 'fwd'){
+    const correct = item.opts.find(o=>o.c);
+    return correct ? correct.t : 'unknown';
+  }
+  const m = item.label.match(/<span class="target">(.*?)<\/span>/);
+  return m ? m[1] : item.label;
+}
+
+function pickBalancedRound(base, id, size){
+  const allIdx = base.items.map((_,i)=>i);
+  const prevUsed = new Set(lastRoundIndices[id] || []);
+  let pool = allIdx.filter(i => !prevUsed.has(i));
+  if(pool.length < size) pool = allIdx.slice(); // 안전장치(현재 뱅크 규모상 발생하지 않음)
+
+  // 소재별로 그룹화(같은 소재를 한 회차에 중복 출제하지 않기 위함), 그룹 내부는 방향별로 분리
+  const byTopic = {};
+  pool.forEach(i => {
+    const t = itemTopic(base.items[i]);
+    if(!byTopic[t]) byTopic[t] = {fwd:[], rev:[]};
+    byTopic[t][base.items[i].dir].push(i);
+  });
+  Object.values(byTopic).forEach(g => { g.fwd = shuffle(g.fwd); g.rev = shuffle(g.rev); });
+
+  let topics = shuffle(Object.keys(byTopic));
+  const chosen = [];
+  let fwdCount = 0, revCount = 0;
+  const targetFwd = Math.ceil(size / 2);
+  let ti = 0, guard = 0;
+
+  while(chosen.length < size && guard < 1000){
+    guard++;
+    if(ti >= topics.length){
+      // 모든 소재를 한 바퀴 돌았는데 아직 부족하면(주제 수가 출제 수보다 적을 때) 남은 소재로 다시 순회
+      topics = shuffle(topics.filter(t => byTopic[t].fwd.length + byTopic[t].rev.length > 0));
+      ti = 0;
+      if(topics.length === 0) break;
+    }
+    const g = byTopic[topics[ti]];
+    const wantFwd = fwdCount < targetFwd;
+    let pickedIdx = null;
+    if(wantFwd && g.fwd.length) pickedIdx = g.fwd.shift();
+    else if(!wantFwd && g.rev.length) pickedIdx = g.rev.shift();
+    else if(g.fwd.length) pickedIdx = g.fwd.shift();
+    else if(g.rev.length) pickedIdx = g.rev.shift();
+
+    if(pickedIdx !== null){
+      chosen.push(pickedIdx);
+      if(base.items[pickedIdx].dir === 'fwd') fwdCount++; else revCount++;
+    }
+    ti++;
+  }
+
+  const chosenIdx = shuffle(chosen);
+  lastRoundIndices[id] = chosenIdx.slice();
+  return chosenIdx.map(i => base.items[i]);
+}
+
+function startFramework(id, seconds){
+  roundSeconds = seconds;
+  const base = frameworks.find(f=>f.id===id);
+  curFw = {
+    ...base,
+    items: pickBalancedRound(base, id, ROUND_SIZE[id]).map(it => ({...it, opts: shuffle(it.opts)}))
+  };
+  curFwId = id;
+  itemIdx = 0;
+  firstTryResults = [];
+  document.getElementById('difficultyScreen').classList.add('hidden');
+  document.getElementById('summaryScreen').classList.add('hidden');
+  document.getElementById('itemScreen').classList.remove('hidden');
+  renderItem();
+}
+
+// ---- 정답/오답 사운드 + 음소거 (규칙 9) ----
+let audioCtx = null;
+let isMuted = (localStorage.getItem('quizMuted') === '1');
+
+function getAudioCtx(){
+  if(!audioCtx){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AC();
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playTone(freq, duration, type, delay){
+  if(isMuted) return;
+  try{
+    const ctx = getAudioCtx();
+    const start = ctx.currentTime + (delay||0);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, start);
+    gain.gain.setValueAtTime(0.001, start);
+    gain.gain.exponentialRampToValueAtTime(0.16, start + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(start);
+    osc.stop(start + duration + 0.02);
+  }catch(e){}
+}
+
+function playCorrectSound(){
+  playTone(660, 0.11, 'sine', 0);
+  playTone(880, 0.16, 'sine', 0.08);
+}
+function playWrongSound(){
+  playTone(196, 0.22, 'square', 0);
+}
+
+function toggleMute(){
+  isMuted = !isMuted;
+  localStorage.setItem('quizMuted', isMuted ? '1' : '0');
+  updateMuteBtn();
+  if(!isMuted) getAudioCtx();
+}
+function updateMuteBtn(){
+  const btn = document.getElementById('muteBtn');
+  if(btn) btn.textContent = isMuted ? '🔇' : '🔊';
+}
+
+function showFeedbackIcon(btn, ok){
+  if(!btn) return;
+  const icon = document.createElement('div');
+  icon.className = 'fb-icon ' + (ok?'ok':'bad');
+  icon.textContent = ok ? '✓' : '✗';
+  btn.appendChild(icon);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>icon.classList.add('show')));
+}
+
+function goHome(){
+  clearInterval(timerInterval);
+  document.getElementById('tabBar').classList.remove('hidden');
+  document.getElementById('difficultyScreen').classList.add('hidden');
+  document.getElementById('itemScreen').classList.add('hidden');
+  document.getElementById('summaryScreen').classList.add('hidden');
+}
+
+function startTimer(onTimeout){
+  clearInterval(timerInterval);
+  let timeLeft = roundSeconds;
+  const fill = document.getElementById('timerBarFill');
+  const num = document.getElementById('timerNum');
+  const render = ()=>{
+    const pct = Math.max(0, (timeLeft/roundSeconds)*100);
+    fill.style.width = pct + '%';
+    fill.style.background = pct <= 25 ? 'var(--bad)' : (pct <= 55 ? 'var(--point)' : 'var(--good)');
+    num.textContent = timeLeft + '초';
+  };
+  fill.style.transition = 'none';
+  render();
+  fill.offsetHeight;
+  fill.style.transition = 'width 1s linear, background-color .3s';
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    if(timeLeft <= 0){
+      clearInterval(timerInterval);
+      timeLeft = 0;
+      render();
+      onTimeout();
+    } else {
+      render();
+    }
+  }, 1000);
+}
+
+function renderItem(){
+  const total = curFw.items.length;
+  const prog = document.getElementById('progress');
+  prog.innerHTML = '';
+  for(let i=0;i<total;i++){
+    const dd = document.createElement('div');
+    dd.className = 'pdot ' + (i<itemIdx?'done':(i===itemIdx?'current':''));
+    prog.appendChild(dd);
+  }
+  const item = curFw.items[itemIdx];
+  document.getElementById('promptLabel').textContent = `문제 ${itemIdx+1} / ${total} · ${curFw.name}`;
+  const ptext = document.getElementById('promptText');
+  if(item.dir === 'rev'){
+    ptext.innerHTML = item.label;
+  } else {
+    ptext.textContent = item.prompt;
+  }
+
+  const optsBox = document.getElementById('opts');
+  optsBox.innerHTML='';
+  document.getElementById('fbBox').innerHTML='';
+  document.getElementById('nextBtn').disabled = true;
+  let firstTry = null;
+  let locked = false;
+
+  function recordFirstTry(val){
+    if(firstTryResults[itemIdx]===undefined){
+      firstTryResults[itemIdx]=val;
+      const fwIdx = frameworks.findIndex(f=>f.id===curFwId);
+      sessionStats[fwIdx].total++;
+      if(val) sessionStats[fwIdx].correct++;
+      renderStats();
+      saveStats();
+    }
+  }
+
+  item.opts.forEach(o=>{
+    const b = document.createElement('button');
+    b.className='opt';
+    b.textContent = o.t;
+    b.onclick = ()=>{
+      if(locked) return;
+      if(firstTry===null) firstTry = o.c;
+      if(o.c){
+        locked = true;
+        clearInterval(timerInterval);
+        b.classList.add('correct');
+        Array.from(optsBox.children).forEach(ch=>ch.disabled=true);
+        document.getElementById('fbBox').innerHTML = `<div class="feedback ok">✓ ${o.f}</div>`;
+        document.getElementById('nextBtn').disabled=false;
+        recordFirstTry(firstTry);
+        showFeedbackIcon(b, true);
+        playCorrectSound();
+      } else {
+        b.classList.add('wrong');
+        b.disabled=true;
+        document.getElementById('fbBox').innerHTML = `<div class="feedback bad">✗ ${o.f}</div>`;
+        showFeedbackIcon(b, false);
+        playWrongSound();
+      }
+    };
+    optsBox.appendChild(b);
+  });
+
+  startTimer(()=>{
+    if(locked) return;
+    locked = true;
+    const correctBtn = Array.from(optsBox.children).find((_,idx)=>item.opts[idx].c);
+    Array.from(optsBox.children).forEach(ch=>ch.disabled=true);
+    if(correctBtn) correctBtn.classList.add('correct');
+    const correctOpt = item.opts.find(o=>o.c);
+    document.getElementById('fbBox').innerHTML = `<div class="feedback bad">⏱ 시간 초과! 정답은 "${correctOpt.t}"입니다. ${correctOpt.f}</div>`;
+    document.getElementById('nextBtn').disabled=false;
+    recordFirstTry(false);
+    if(correctBtn) showFeedbackIcon(correctBtn, true);
+    playWrongSound();
+  });
+}
+
+function nextItem(){
+  if(itemIdx < curFw.items.length-1){
+    itemIdx++;
+    renderItem();
+  } else {
+    showSummary();
+  }
+}
+
+function showSummary(){
+  document.getElementById('itemScreen').classList.add('hidden');
+  document.getElementById('summaryScreen').classList.remove('hidden');
+  document.getElementById('sumTitle').textContent = `"${curFw.name}" 결과`;
+  const rows = document.getElementById('sumRows');
+  rows.innerHTML='';
+  curFw.items.forEach((it,i)=>{
+    const ok = firstTryResults[i];
+    const r = document.createElement('div');
+    r.className='sumrow';
+    r.innerHTML = `<span>문항 ${i+1}</span><span class="mark ${ok?'ok':'bad'}">${ok?'✓ 한 번에 정답':'✗ 오답 경유'}</span>`;
+    rows.appendChild(r);
+  });
+}
+
+function renderStats(){
+  const grid = document.getElementById('statGrid');
+  grid.innerHTML='';
+  sessionStats.forEach((s,i)=>{
+    const pct = s.total? Math.round(100*s.correct/s.total) : null;
+    const cell = document.createElement('div');
+    cell.className='statcell';
+    cell.innerHTML = `<div class="n">${pct===null?'–':pct+'%'}</div><div class="l">${frameworks[i].id}. ${frameworks[i].name}</div>`;
+    grid.appendChild(cell);
+  });
+}
+
+renderTabs();
+renderStats();
+updateMuteBtn();
+</script>
+</body>
+</html>

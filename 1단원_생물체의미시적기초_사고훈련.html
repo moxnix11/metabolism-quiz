@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>생명체의 미시적 기초 · 사고 훈련</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#15190F;
+    --ink:#EDF0E4;
+    --muted:#8B9481;
+    --good:#4CAF6E;
+    --good-soft:rgba(76,175,110,0.14);
+    --accent:#C97D3E;
+    --accent-soft:rgba(201,125,62,0.14);
+    --bad:#C4453E;
+    --bad-soft:rgba(196,69,62,0.14);
+    --point:#E0A64A;
+    --card:#1D2216;
+    --border:#3A4530;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans KR', sans-serif;
+    padding:48px 28px 60px;
+  }
+  .wrap{max-width:680px;margin:0 auto;}
+  h1{
+    font-family:'IBM Plex Sans KR', sans-serif;
+    font-weight:700;
+    font-size: clamp(1.3rem, 4vw, 1.7rem);
+    line-height:1.4;
+    word-break:keep-all;
+    margin:0 0 10px;
+    color:var(--ink);
+  }
+  .sub{color:var(--muted);font-size:1.05rem;margin:0 0 26px;line-height:1.55;word-break:keep-all;}
+
+  .tabs{display:flex;flex-direction:column;gap:10px;margin-bottom:22px;}
+  .tab{
+    flex:1 1 auto;
+    min-width:120px;
+    background:var(--card);
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:13px 15px;
+    cursor:pointer;
+    text-align:left;
+  }
+  .tab:hover{border-color:var(--good);}
+  .tab.active{border-color:var(--good);background:var(--good-soft);}
+  .tab .name{font-size:0.88rem;font-weight:600;}
+
+  .hidden{display:none;}
+
+  .progress{display:flex;gap:6px;margin-bottom:14px;}
+  .pdot{width:22px;height:5px;border-radius:3px;background:var(--border);}
+  .pdot.done{background:var(--good);}
+  .pdot.current{background:var(--point);}
+
+  .specimen{
+    background:var(--card);
+    border:1.5px solid var(--border);
+    border-radius:14px;
+    padding:26px;
+    box-shadow:0 2px 0 var(--border);
+  }
+  .dirtag{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.68rem;
+    padding:3px 9px;
+    border-radius:20px;
+    margin-bottom:12px;
+    letter-spacing:0.03em;
+  }
+  .prompt-label{font-size:0.72rem;color:var(--accent);font-family:'IBM Plex Sans KR', sans-serif;font-weight:700;letter-spacing:0.02em;margin-bottom:6px;}
+  .prompt-text{font-size:1.05rem;line-height:1.6;margin:0 0 18px;}
+  .prompt-text .target{color:var(--good);font-weight:700;}
+
+  .opt{
+    display:block;width:100%;text-align:left;
+    background:#232B1A;
+    border:1.3px solid var(--border);
+    color:var(--ink);
+    padding:14px 16px;
+    border-radius:9px;
+    margin-bottom:10px;
+    cursor:pointer;
+    font-size:0.93rem;
+    font-family:inherit;
+  }
+  .opt:hover:not(:disabled){border-color:var(--good);}
+  .opt.correct{border-color:var(--good);background:var(--good-soft);}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-soft);}
+  .opt{position:relative;overflow:visible;}
+  .fb-icon{
+    position:absolute;top:-9px;right:-9px;width:24px;height:24px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;
+    opacity:0;transform:scale(0.4);transition:opacity 0.16s ease,transform 0.16s ease;
+    pointer-events:none;box-shadow:0 2px 6px rgba(0,0,0,0.35);
+  }
+  .fb-icon.show{opacity:1;transform:scale(1);}
+  .fb-icon.ok{background:var(--good);color:#0A140D;}
+  .fb-icon.bad{background:var(--bad);color:#160707;}
+  .muteBtn{
+    background:none;border:1.3px solid var(--border);color:var(--muted);
+    width:40px;height:40px;min-width:40px;border-radius:50%;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:19px;
+    margin-left:8px;flex-shrink:0;
+  }
+  .muteBtn:hover{border-color:var(--point);color:var(--point);}
+  .opt:disabled{cursor:default;}
+
+  .feedback{
+    margin-top:8px;
+    padding:12px 14px;
+    border-radius:9px;
+    font-size:0.88rem;
+    line-height:1.55;
+    position:relative;
+  }
+  .feedback.ok{background:var(--good-soft);border:1px solid var(--good);color:#DFFCF5;}
+  .feedback.bad{background:var(--bad-soft);border:1px solid var(--bad);color:#FFE3E3;}
+
+  .navrow{display:flex;justify-content:flex-end;margin-top:16px;}
+  button.primary{
+    background:var(--good);color:#0B2420;border:none;
+    padding:10px 20px;border-radius:9px;font-weight:600;cursor:pointer;font-family:inherit;
+  }
+  button.primary:disabled{opacity:0.35;cursor:default;}
+  button.ghost{
+    background:none;border:1.3px solid var(--border);color:var(--muted);
+    padding:9px 16px;border-radius:9px;cursor:pointer;font-family:inherit;
+  }
+  .back{background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.85rem;margin-bottom:12px;font-family:inherit;padding:0;}
+  .back:hover{color:var(--good);}
+
+  .sumrow{display:flex;justify-content:space-between;align-items:center;padding:9px 4px;border-bottom:1px dashed var(--border);font-size:0.9rem;}
+  .sumrow:last-child{border-bottom:none;}
+  .mark{font-family:'IBM Plex Sans KR', sans-serif;font-weight:700;font-size:0.82rem;}
+  .mark.ok{color:var(--good);}
+  .mark.bad{color:var(--bad);}
+
+  .diffgaugebox{margin-top:10px;padding:6px 4px;}
+  .diffvalue{
+    font-family:'IBM Plex Mono',monospace;font-size:2.2rem;font-weight:700;
+    text-align:center;color:var(--point);margin-bottom:10px;transition:color .2s;
+  }
+  input[type=range]{
+    -webkit-appearance:none; appearance:none;
+    width:100%;height:8px;border-radius:5px;outline:none;cursor:pointer;
+    background:var(--border);
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;
+    width:24px;height:24px;border-radius:50%;
+    background:var(--ink);border:3px solid var(--point);
+    cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.4);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:24px;height:24px;border-radius:50%;
+    background:var(--ink);border:3px solid var(--point);
+    cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.4);
+  }
+  input[type=range]::-moz-range-track{height:8px;border-radius:5px;background:var(--border);}
+  .diffscale{display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);margin-top:6px;}
+  .difflabel{text-align:center;font-size:0.85rem;font-weight:700;color:var(--muted);margin-top:10px;}
+
+  .timerRow{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .timerBarTrack{flex:1;height:8px;border-radius:5px;background:var(--card);border:1px solid var(--border);overflow:hidden;}
+  .timerBarFill{height:100%;width:100%;background:var(--good);transition:width 1s linear, background-color .3s;}
+  .timerNum{font-family:'IBM Plex Mono',monospace;font-size:0.85rem;font-weight:600;color:var(--ink);min-width:34px;text-align:right;}
+
+  .statsbar{margin-top:30px;padding-top:16px;border-top:1px solid var(--border);}
+  .statsHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;}
+  .statsHeader h4{margin:0;}
+  .resetLink{
+    background:none;border:1px solid var(--border);color:var(--muted);
+    font-family:'IBM Plex Sans KR', sans-serif;font-size:0.72rem;
+    padding:4px 10px;border-radius:20px;cursor:pointer;flex-shrink:0;
+  }
+  .resetLink:hover{border-color:var(--bad);color:var(--bad);}
+  .statsbar h4{font-size:0.78rem;color:var(--muted);font-family:'IBM Plex Sans KR', sans-serif;font-weight:700;letter-spacing:0.02em;margin:0;}
+  .statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+  @media(max-width:520px){ .statgrid{grid-template-columns:repeat(2,1fr);} .tabs{flex-direction:column;} .tab{min-width:0;} }
+  .statcell{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 4px;text-align:center;}
+  .statcell .n{font-family:'IBM Plex Mono',monospace;font-size:0.95rem;font-weight:600;color:var(--good);}
+  .statcell .l{font-size:0.62rem;color:var(--muted);margin-top:3px;line-height:1.3;word-break:keep-all;padding:0 2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>생명체의 미시적 기초 — 사고 훈련</h1>
+  <p class="sub">작은 분자들이 결합해 세포를 이루는 큰 물질이 되기까지, 그 구성과 특징을 단계별로 따라가며 익히는 연습이에요.</p>
+
+  <div class="tabs" id="tabBar"></div>
+
+  <div id="difficultyScreen" class="hidden">
+    <button class="back" onclick="goHome()">&larr; 주제 목록으로</button>
+    <div class="specimen">
+      <div class="prompt-label" id="diffTitle"></div>
+      <p class="prompt-text">한 문제당 제한 시간을 골라주세요. 시간이 다 되면 자동으로 오답 처리돼요.</p>
+      <div class="diffgaugebox">
+        <div class="diffvalue" id="diffValue">15초</div>
+        <input type="range" id="diffSlider" min="5" max="30" step="1" value="15" oninput="updateDiffDisplay()">
+        <div class="diffscale"><span>5초 (빠름)</span><span>30초 (여유)</span></div>
+        <div class="difflabel" id="diffLabel">보통 속도</div>
+        <button class="primary" style="margin-top:16px;width:100%;" onclick="confirmDifficulty()">이 시간으로 시작하기</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="itemScreen" class="hidden">
+    <button class="back" onclick="goHome()">&larr; 주제 목록으로</button>
+    <div class="progress" id="progress"></div>
+    <div class="timerRow">
+      <div class="timerBarTrack"><div class="timerBarFill" id="timerBarFill"></div></div>
+      <span class="timerNum" id="timerNum">--</span>
+      <button class="muteBtn" id="muteBtn" onclick="toggleMute()" aria-label="소리 켜기/끄기" type="button">🔊</button>
+    </div>
+    <div class="specimen">
+      <div class="prompt-label" id="promptLabel"></div>
+      <p class="prompt-text" id="promptText"></p>
+      <div id="opts"></div>
+      <div id="fbBox"></div>
+      <div class="navrow">
+        <button class="primary" id="nextBtn" disabled onclick="nextItem()">다음 →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="summaryScreen" class="hidden">
+    <button class="back" onclick="goHome()">&larr; 주제 목록으로</button>
+    <div class="specimen">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--point);margin-bottom:8px;">RESULT</div>
+      <div id="sumTitle" style="font-size:1.05rem;font-weight:700;margin-bottom:10px;"></div>
+      <div id="sumRows"></div>
+      <div class="navrow" style="justify-content:space-between;">
+        <button class="ghost" onclick="openDifficultyScreen(curFwId)">다시 풀기</button>
+        <button class="primary" onclick="goHome()">다른 주제 풀기</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="statsbar">
+    <div class="statsHeader">
+      <h4>학습 현황 · 주제별 한 번에 맞힌 문제 비율</h4>
+      <button class="resetLink" onclick="resetStats()">기록 초기화</button>
+    </div>
+    <div class="statgrid" id="statGrid"></div>
+  </div>
+</div>
+
+<script>
+const frameworks = [
+  {
+    "id": "A",
+    "code": "[12세포01-01·12세포01-02]",
+    "name": "생물체의 구성 물질",
+    "items": [
+      {
+        "dir": "fwd",
+        "prompt": "포도나 사과 같은 과일에 들어있는 과당은 더 이상 쪼개지지 않는 가장 단순한 형태의 당이다.",
+        "opts": [
+          {
+            "t": "단당류",
+            "c": true,
+            "f": "하나의 당으로만 이루어진 가장 단순한 형태이므로 단당류입니다."
+          },
+          {
+            "t": "이당류",
+            "c": false,
+            "f": "두 개의 단순한 당이 결합한 형태가 이당류인데, 이 물질은 더는 쪼개지지 않는 가장 단순한 형태이므로 단당류입니다."
+          },
+          {
+            "t": "다당류",
+            "c": false,
+            "f": "여러 개의 당이 사슬처럼 길게 연결된 형태가 다당류인데, 이 물질은 그 자체로 가장 단순한 형태이므로 단당류입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "식물의 잎에서 광합성으로 만들어진 포도당은 다른 단당류(과당)와 결합해 설탕(자당)으로 바뀌고, 이 설탕이 체관을 통해 뿌리나 열매 같은 필요한 부위로 운반된다.",
+        "opts": [
+          {
+            "t": "이당류",
+            "c": true,
+            "f": "서로 다른 단당류 2분자(포도당+과당)가 결합한 형태이므로 이당류입니다."
+          },
+          {
+            "t": "단당류",
+            "c": false,
+            "f": "하나의 당으로만 이루어진 형태가 단당류인데, 이 물질은 서로 다른 단당류 2분자가 결합한 형태이므로 이당류입니다."
+          },
+          {
+            "t": "다당류",
+            "c": false,
+            "f": "수많은 단당류가 사슬처럼 길게 연결된 형태가 다당류인데, 이 물질은 단당류 2분자만 결합한 형태이므로 이당류입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">다당류</span>의 예에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "게나 새우 같은 갑각류의 겉껍질과 곰팡이의 세포벽을 이루며, 단위체가 매우 길게 이어진 물질",
+            "c": true,
+            "f": "단위체가 반복적으로 길게 연결된 사슬 구조이므로 다당류(키틴)의 예입니다."
+          },
+          {
+            "t": "포도당처럼 그 자체로 더 이상 쪼개지지 않는 가장 작은 단위의 당",
+            "c": false,
+            "f": "이건 단당류의 예입니다."
+          },
+          {
+            "t": "설탕처럼 단당류 두 분자가 결합해 만들어지는 당",
+            "c": false,
+            "f": "이건 이당류의 예입니다."
+          },
+          {
+            "t": "글리세롤과 지방산이 결합해 에너지를 저장하는 물질",
+            "c": false,
+            "f": "이건 중성지방(지질)의 예입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "사람의 간과 근육에는 여분의 포도당이 사슬 모양으로 길게 연결되어 저장되어 있다가, 혈당이 낮아지면 다시 포도당으로 분해되어 쓰인다.",
+        "opts": [
+          {
+            "t": "다당류",
+            "c": true,
+            "f": "포도당이 사슬처럼 길게 연결되어 저장되는 형태이므로 다당류입니다."
+          },
+          {
+            "t": "단당류",
+            "c": false,
+            "f": "그 자체로 가장 단순한 하나의 당이 단당류인데, 이 물질은 포도당이 길게 연결된 사슬 형태이므로 다당류입니다."
+          },
+          {
+            "t": "이당류",
+            "c": false,
+            "f": "단당류 2개만 결합한 형태가 이당류인데, 이 물질은 훨씬 많은 포도당이 연결된 사슬이므로 다당류입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "나비는 애벌레 시절 몸에 축적해 둔 이 물질을 번데기 시기에 분해하여 변태에 필요한 에너지를 얻는다. 이 물질은 글리세롤 1분자와 지방산 3분자가 결합한 형태이다.",
+        "opts": [
+          {
+            "t": "중성지방",
+            "c": true,
+            "f": "글리세롤 1분자와 지방산 3분자가 결합한 구조이자 주요 에너지 저장 물질이므로 중성지방입니다."
+          },
+          {
+            "t": "인지질",
+            "c": false,
+            "f": "인지질은 글리세롤에 지방산 2분자와 인산이 결합한 형태인데, 이 물질은 지방산 3분자가 결합한 형태이므로 중성지방입니다."
+          },
+          {
+            "t": "스테로이드",
+            "c": false,
+            "f": "스테로이드는 탄소 고리 화합물 4개가 연결된 구조인데, 이 물질은 글리세롤과 지방산이 결합한 구조이므로 중성지방입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "세포막을 이루는 이 물질은 인산이 포함된 머리 부분은 물을 좋아하고, 지방산으로 이루어진 꼬리 부분은 물을 싫어하는 두 가지 성질을 함께 지닌다.",
+        "opts": [
+          {
+            "t": "인지질",
+            "c": true,
+            "f": "친수성 머리와 소수성 꼬리를 함께 지니고 세포막을 구성하는 물질이므로 인지질입니다."
+          },
+          {
+            "t": "중성지방",
+            "c": false,
+            "f": "중성지방은 에너지 저장이 주된 역할이고 인산을 포함하지 않는데, 이 물질은 인산이 포함된 친수성 머리를 가지므로 인지질입니다."
+          },
+          {
+            "t": "스테로이드",
+            "c": false,
+            "f": "스테로이드는 탄소 고리 구조인데, 이 물질은 머리와 꼬리 부분의 성질이 다른 구조이므로 인지질입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "부신에서 분비되는 코르티솔과 같은 호르몬은 탄소로 이루어진 고리 화합물 4개가 서로 연결된 구조의 물질로부터 만들어진다.",
+        "opts": [
+          {
+            "t": "스테로이드",
+            "c": true,
+            "f": "탄소 고리 화합물 4개가 연결된 구조이자 호르몬의 재료가 되는 물질이므로 스테로이드입니다."
+          },
+          {
+            "t": "중성지방",
+            "c": false,
+            "f": "중성지방은 글리세롤과 지방산이 결합한 구조인데, 이 물질은 탄소 고리 4개가 연결된 구조이므로 스테로이드입니다."
+          },
+          {
+            "t": "인지질",
+            "c": false,
+            "f": "인지질은 친수성 머리와 소수성 꼬리를 가진 구조인데, 이 물질은 고리 화합물이 연결된 구조이므로 스테로이드입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "세포를 갈아 만든 추출액에 물과 에탄올을 함께 넣고 흔든 뒤 가만히 두었더니 물층과 에탄올층으로 분리되었다. 두 층을 나누어 분석해 보니, 중성지방과 스테로이드 계열의 물질은 대부분 에탄올층에서 검출되고 물층에서는 거의 검출되지 않았다.",
+        "opts": [
+          {
+            "t": "지질",
+            "c": true,
+            "f": "물보다 알코올 같은 유기용매에 더 잘 녹아 에탄올층에서 주로 검출되는 것은 지질(중성지방·인지질·스테로이드)의 공통적인 용해 특성입니다."
+          },
+          {
+            "t": "탄수화물",
+            "c": false,
+            "f": "탄수화물은 대부분 물에 잘 녹아 물층에서 주로 검출되므로, 에탄올층에서 검출된 이 물질들은 지질입니다."
+          },
+          {
+            "t": "핵산",
+            "c": false,
+            "f": "핵산은 물에 잘 녹는 성질을 가지므로, 유기용매인 에탄올층에서 검출된 이 물질들은 지질입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">다당류</span>의 예에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "단위체가 매우 길게 사슬처럼 이어져 곰팡이의 세포벽을 이루는 물질",
+            "c": true,
+            "f": "단위체가 길게 반복 연결된 사슬 구조이므로 다당류의 예입니다."
+          },
+          {
+            "t": "더는 쪼개지지 않는 가장 단순한 형태의 당",
+            "c": false,
+            "f": "이건 단당류의 예입니다."
+          },
+          {
+            "t": "서로 다른 단당류 두 분자가 결합해 식물의 체관을 통해 운반되는 당",
+            "c": false,
+            "f": "이건 이당류의 예입니다."
+          },
+          {
+            "t": "글리세롤 1분자와 지방산 3분자가 결합한 에너지 저장 물질",
+            "c": false,
+            "f": "이건 중성지방(지질)의 예입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">인지질</span>의 특징에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "친수성 머리와 소수성 꼬리를 함께 지니며 세포막을 구성한다",
+            "c": true,
+            "f": "친수성과 소수성 부분을 함께 가지고 세포막을 이루는 것은 인지질의 특징입니다."
+          },
+          {
+            "t": "글리세롤 1분자와 지방산 3분자가 결합해 에너지를 저장한다",
+            "c": false,
+            "f": "이건 중성지방의 특징입니다."
+          },
+          {
+            "t": "탄소 고리 화합물 4개가 연결되어 호르몬의 재료가 된다",
+            "c": false,
+            "f": "이건 스테로이드의 특징입니다."
+          },
+          {
+            "t": "여러 단당류가 길게 연결되어 생물체의 구조를 이룬다",
+            "c": false,
+            "f": "이건 다당류의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">지질</span>에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "글리세롤 1분자와 지방산 3분자가 결합해 에너지를 저장하는 물질",
+            "c": true,
+            "f": "글리세롤과 지방산이 결합한 중성지방은 지질에 속합니다."
+          },
+          {
+            "t": "포도당 2분자가 결합해 곤충의 체액을 순환하는 당",
+            "c": false,
+            "f": "이건 탄수화물(이당류)의 예입니다."
+          },
+          {
+            "t": "단위체가 길게 사슬처럼 이어져 곰팡이 세포벽을 이루는 물질",
+            "c": false,
+            "f": "이건 탄수화물(다당류)의 예입니다."
+          },
+          {
+            "t": "더는 쪼개지지 않는 가장 단순한 형태의 당",
+            "c": false,
+            "f": "이건 탄수화물(단당류)의 예입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">이당류</span>의 예에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "잎에서 만들어진 두 종류의 단당류가 결합한 뒤, 줄기 속 체관을 타고 다른 조직으로 옮겨지는 당",
+            "c": true,
+            "f": "서로 다른 단당류 2분자(포도당+과당)가 결합한 형태이므로 이당류의 예입니다."
+          },
+          {
+            "t": "간과 근육에 사슬 모양으로 길게 연결되어 저장되는 당",
+            "c": false,
+            "f": "이건 다당류의 예입니다."
+          },
+          {
+            "t": "탄소 고리 화합물 4개로 이루어져 호르몬의 재료가 되는 물질",
+            "c": false,
+            "f": "이건 스테로이드(지질)의 예입니다."
+          },
+          {
+            "t": "세포막에서 친수성과 소수성을 함께 나타내는 물질",
+            "c": false,
+            "f": "이건 인지질(지질)의 예입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "두 아미노산이 결합할 때, 한쪽의 카복실기와 다른 쪽의 아미노기 사이에서 물 분자 하나가 빠져나오면서 이 결합이 형성된다.",
+        "opts": [
+          {
+            "t": "펩타이드결합",
+            "c": true,
+            "f": "아미노산의 카복실기와 아미노기 사이에서 물이 빠지며 형성되는 결합이므로 펩타이드결합입니다."
+          },
+          {
+            "t": "수소결합",
+            "c": false,
+            "f": "수소결합은 DNA 두 가닥의 염기 사이 등에서 나타나는 결합인데, 이 설명은 물 분자가 빠지며 아미노산끼리 연결되는 것이므로 펩타이드결합입니다."
+          },
+          {
+            "t": "글리코시드결합",
+            "c": false,
+            "f": "글리코시드결합은 당과 당 사이의 결합인데, 이 설명은 아미노산과 아미노산 사이의 결합이므로 펩타이드결합입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "혈액 속 헤모글로빈은 서로 다른 폴리펩타이드 사슬 4개(α사슬 2개, β사슬 2개)가 모여 산소를 운반하는 하나의 단백질을 이룬다.",
+        "opts": [
+          {
+            "t": "4차 구조",
+            "c": true,
+            "f": "폴리펩타이드 사슬 여러 개가 모여 하나의 단백질을 이루는 구조이므로 4차 구조입니다."
+          },
+          {
+            "t": "1차 구조",
+            "c": false,
+            "f": "1차 구조는 아미노산이 펩타이드결합으로 연결된 사슬 자체인데, 이 설명은 서로 다른 폴리펩타이드 4개가 모인 것이므로 4차 구조입니다."
+          },
+          {
+            "t": "2차 구조",
+            "c": false,
+            "f": "2차 구조는 하나의 폴리펩타이드가 나선이나 병풍 모양으로 접힌 것인데, 이 설명은 폴리펩타이드 4개가 모인 것이므로 4차 구조입니다."
+          },
+          {
+            "t": "3차 구조",
+            "c": false,
+            "f": "3차 구조는 하나의 폴리펩타이드가 접혀 입체 구조를 이루는 것인데, 이 설명은 서로 다른 폴리펩타이드 4개가 모인 것이므로 4차 구조입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "우리 몸의 피부, 힘줄, 연골 등에 풍부하게 존재하는 콜라겐은 조직 곳곳에 그물처럼 얽혀 몸을 지지하는 구조를 이룬다.",
+        "opts": [
+          {
+            "t": "몸을 구성한다",
+            "c": true,
+            "f": "단백질(콜라겐)이 피부·힘줄·연골 같은 몸의 구조를 직접 이루는 경우이므로 구성 기능의 예입니다."
+          },
+          {
+            "t": "효소·호르몬으로 작용을 조절한다",
+            "c": false,
+            "f": "물질대사나 생리작용을 조절하는 것이 아니라, 단백질 자체가 구조를 이루는 경우이므로 구성 기능의 예입니다."
+          },
+          {
+            "t": "방어작용을 한다",
+            "c": false,
+            "f": "병원체를 방어하는 것이 아니라, 단백질이 몸의 구조를 이루는 경우이므로 구성 기능의 예입니다."
+          },
+          {
+            "t": "에너지원이나 물질 수송에 쓰인다",
+            "c": false,
+            "f": "에너지원이나 수송 통로로 쓰이는 것이 아니라, 단백질이 몸의 구조를 이루는 경우이므로 구성 기능의 예입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "체내에 침입한 병원체에 결합해 무력화하는 항체는 단백질로 이루어져 있다.",
+        "opts": [
+          {
+            "t": "방어작용을 한다",
+            "c": true,
+            "f": "병원체에 결합해 무력화하는 것은 방어작용이므로 방어작용의 예입니다."
+          },
+          {
+            "t": "몸을 구성한다",
+            "c": false,
+            "f": "몸의 구조를 이루는 것이 아니라 병원체를 무력화하는 작용이므로 방어작용의 예입니다."
+          },
+          {
+            "t": "효소·호르몬으로 작용을 조절한다",
+            "c": false,
+            "f": "물질대사나 생리작용을 조절하는 것이 아니라 병원체를 직접 무력화하는 작용이므로 방어작용의 예입니다."
+          },
+          {
+            "t": "에너지원이나 물질 수송에 쓰인다",
+            "c": false,
+            "f": "에너지원이나 수송 통로로 쓰이는 것이 아니라 병원체를 무력화하는 작용이므로 방어작용의 예입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "이 핵산의 기본 단위체는 인산, 당, 염기가 1:1:1로 결합한 뉴클레오타이드이며, 사람의 경우 두 가닥의 폴리뉴클레오타이드가 나선 모양으로 꼬여 있다.",
+        "opts": [
+          {
+            "t": "DNA",
+            "c": true,
+            "f": "두 가닥의 폴리뉴클레오타이드가 이중나선을 이루는 것은 DNA의 특징입니다."
+          },
+          {
+            "t": "RNA",
+            "c": false,
+            "f": "RNA는 한 가닥의 폴리뉴클레오타이드로 되어 있는데, 이 설명은 두 가닥이 나선으로 꼬인 구조이므로 DNA입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "이 핵산은 한 가닥의 폴리뉴클레오타이드로 이루어져 있으며, 유전정보를 전달하거나 단백질합성 과정에 관여한다.",
+        "opts": [
+          {
+            "t": "RNA",
+            "c": true,
+            "f": "한 가닥으로 이루어져 있고 유전정보 전달·단백질합성에 관여하는 것은 RNA의 특징입니다."
+          },
+          {
+            "t": "DNA",
+            "c": false,
+            "f": "DNA는 두 가닥이 이중나선을 이루며 유전정보를 저장하는데, 이 설명은 한 가닥으로 유전정보를 전달하는 역할이므로 RNA입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">DNA</span>의 특징에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "구성 당에 산소 원자가 하나 적은 디옥시라이보스를 사용한다",
+            "c": true,
+            "f": "당으로 디옥시라이보스를 갖는 것은 DNA의 특징입니다."
+          },
+          {
+            "t": "산소 원자를 하나 더 가진 라이보스를 당으로 사용한다",
+            "c": false,
+            "f": "이건 RNA의 특징입니다."
+          },
+          {
+            "t": "염기로 유라실을 갖는다",
+            "c": false,
+            "f": "이건 RNA의 특징입니다."
+          },
+          {
+            "t": "단위체가 아미노산으로 이루어진다",
+            "c": false,
+            "f": "이건 단백질의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">RNA</span>의 특징에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "염기 구성에 아데닌·구아닌·사이토신과 함께 유라실이 포함된다",
+            "c": true,
+            "f": "염기로 유라실을 갖는 것은 RNA의 특징입니다(DNA는 유라실 대신 타이민을 갖습니다)."
+          },
+          {
+            "t": "유라실 대신 타이민을 염기로 갖는다",
+            "c": false,
+            "f": "이건 DNA의 특징입니다."
+          },
+          {
+            "t": "두 가닥이 나선 모양으로 꼬여 있다",
+            "c": false,
+            "f": "이건 DNA의 특징입니다."
+          },
+          {
+            "t": "인산·당·염기가 아니라 아미노산이 단위체이다",
+            "c": false,
+            "f": "이건 단백질의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">단백질</span>의 예에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "피부와 힘줄, 연골 곳곳에 그물처럼 얽혀 몸을 지지하는 콜라겐",
+            "c": true,
+            "f": "단백질(콜라겐)로 이루어져 몸의 구조를 만드는 물질이므로 단백질의 예입니다."
+          },
+          {
+            "t": "두 가닥이 나선 모양으로 꼬여 유전정보를 저장하는 물질",
+            "c": false,
+            "f": "이건 DNA(핵산)의 예입니다."
+          },
+          {
+            "t": "염기에 유라실이 있고 한 가닥으로 이루어진 물질",
+            "c": false,
+            "f": "이건 RNA(핵산)의 예입니다."
+          },
+          {
+            "t": "인산, 당, 염기가 1:1:1로 결합한 단위체로 이루어진 물질",
+            "c": false,
+            "f": "이건 핵산(뉴클레오타이드로 이루어진 물질)의 예입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">DNA</span>의 특징에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "두 개의 폴리뉴클레오타이드 사슬이 서로 감겨 이중나선의 입체 구조를 만든다",
+            "c": true,
+            "f": "두 가닥이 서로 감겨 이중나선 구조를 만드는 것은 DNA의 특징입니다."
+          },
+          {
+            "t": "한 가닥으로 되어 있으며 유전정보를 전달한다",
+            "c": false,
+            "f": "이건 RNA의 특징입니다."
+          },
+          {
+            "t": "병원체에 결합해 무력화하는 항체의 주성분이다",
+            "c": false,
+            "f": "이건 단백질의 특징입니다."
+          },
+          {
+            "t": "물질대사와 생리작용을 조절하는 효소·호르몬의 주성분이다",
+            "c": false,
+            "f": "이건 단백질의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">4차 구조</span>에 해당하는 예를 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "적혈구에서 산소를 운반하는 이 단백질은 각각 따로 만들어진 폴리펩타이드 사슬 네 가닥(두 종류가 두 개씩)이 한데 뭉쳐야 비로소 완전한 기능을 갖춘다",
+            "c": true,
+            "f": "따로 만들어진 폴리펩타이드 사슬 여러 개가 모여야 완전한 단백질이 되는 것은 4차 구조(헤모글로빈)의 특징입니다."
+          },
+          {
+            "t": "아미노산 하나하나가 펩타이드결합으로 연결된 사슬 상태",
+            "c": false,
+            "f": "이건 1차 구조의 예입니다."
+          },
+          {
+            "t": "하나의 폴리펩타이드가 나선이나 병풍 모양으로 접힌 상태",
+            "c": false,
+            "f": "이건 2차 구조의 예입니다."
+          },
+          {
+            "t": "폴리뉴클레오타이드 두 가닥이 이중나선을 이룬 상태",
+            "c": false,
+            "f": "이건 핵산(DNA)의 구조이지, 단백질의 구조 단계가 아닙니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">RNA</span>의 예에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "염기에 유라실이 있고 당이 라이보스인 한 가닥 구조의 물질",
+            "c": true,
+            "f": "유라실을 염기로 갖고 한 가닥으로 이루어진 것은 RNA의 예입니다."
+          },
+          {
+            "t": "염기에 타이민이 있고 당이 디옥시라이보스인 두 가닥 구조의 물질",
+            "c": false,
+            "f": "이건 DNA의 예입니다."
+          },
+          {
+            "t": "아미노산이 펩타이드결합으로 연결된 사슬",
+            "c": false,
+            "f": "이건 단백질의 예입니다."
+          },
+          {
+            "t": "병원체에 결합해 무력화하는 방어 작용을 하는 물질",
+            "c": false,
+            "f": "이건 단백질(항체)의 예입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "항균 작용을 하는 라이소자임은 하나의 폴리펩타이드 사슬이 복잡하게 접혀 입체 구조를 이루며, 세균의 세포벽을 분해하는 부위를 만든다.",
+        "opts": [
+          {
+            "t": "3차 구조",
+            "c": true,
+            "f": "하나의 폴리펩타이드가 접혀 독립적인 입체 구조를 이루는 것이므로 3차 구조입니다."
+          },
+          {
+            "t": "1차 구조",
+            "c": false,
+            "f": "1차 구조는 아미노산이 펩타이드결합으로 연결된 사슬 자체인데, 이 설명은 그 사슬이 접혀 입체 구조를 이룬 것이므로 3차 구조입니다."
+          },
+          {
+            "t": "2차 구조",
+            "c": false,
+            "f": "2차 구조는 폴리펩타이드 일부가 나선이나 병풍 모양으로 접힌 것인데, 이 설명은 사슬 전체가 접혀 독립된 입체 구조를 완성한 것이므로 3차 구조입니다."
+          },
+          {
+            "t": "4차 구조",
+            "c": false,
+            "f": "4차 구조는 서로 다른 폴리펩타이드가 2개 이상 모인 것인데, 이 설명은 폴리펩타이드가 1개뿐이므로 3차 구조입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "혈액 속에서 산소를 운반하는 헤모글로빈의 β사슬은 아미노산 146개가 펩타이드결합으로 순서대로 연결된 사슬 그 자체이며, 아직 입체적으로 접히기 전 상태를 가리킨다.",
+        "opts": [
+          {
+            "t": "1차 구조",
+            "c": true,
+            "f": "아미노산이 펩타이드결합으로 연결된 사슬 자체를 가리키는 것은 1차 구조입니다."
+          },
+          {
+            "t": "2차 구조",
+            "c": false,
+            "f": "2차 구조는 사슬 일부가 나선이나 병풍 모양으로 접힌 것인데, 이 설명은 아직 접히지 않은 사슬 자체이므로 1차 구조입니다."
+          },
+          {
+            "t": "3차 구조",
+            "c": false,
+            "f": "3차 구조는 폴리펩타이드가 입체적으로 접힌 것인데, 이 설명은 접히기 전 사슬 상태이므로 1차 구조입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">3차 구조</span>에 해당하는 예를 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "눈물이나 침 속에도 들어있는 이 항균 단백질은, 한 가닥짜리 폴리펩타이드가 스스로 접혀 세균 세포벽을 자르는 부위를 만들어 낸 상태를 가리킨다",
+            "c": true,
+            "f": "폴리펩타이드 사슬 1개가 접혀 독립적인 입체 구조(세균 세포벽을 자르는 부위 포함)를 만드는 것은 3차 구조(라이소자임)의 예입니다."
+          },
+          {
+            "t": "산소 운반 단백질인 헤모글로빈처럼, 서로 다른 폴리펩타이드 사슬 여러 개가 모여 하나의 단백질을 이룬 상태",
+            "c": false,
+            "f": "이건 4차 구조의 예입니다."
+          },
+          {
+            "t": "아미노산이 펩타이드결합으로 연결된 사슬 자체인 상태",
+            "c": false,
+            "f": "이건 1차 구조의 예입니다."
+          },
+          {
+            "t": "폴리뉴클레오타이드 두 가닥이 이중나선을 이룬 상태",
+            "c": false,
+            "f": "이건 핵산(DNA)의 구조이지, 단백질의 구조 단계가 아닙니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "탄수화물과 지질을 이루는 기본 원소는 탄소(C), 수소(H), 산소(O) 세 가지뿐이지만, 이 물질은 여기에 질소(N)까지 포함하며 아미노산이 기본 단위체이다.",
+        "opts": [
+          {
+            "t": "단백질",
+            "c": true,
+            "f": "탄소·수소·산소에 더해 질소를 포함하고 아미노산을 단위체로 하는 것은 단백질의 특징입니다."
+          },
+          {
+            "t": "지질",
+            "c": false,
+            "f": "지질은 탄소·수소·산소만으로 이루어지는데, 이 물질은 질소까지 포함하므로 단백질입니다."
+          },
+          {
+            "t": "핵산",
+            "c": false,
+            "f": "핵산은 단위체가 뉴클레오타이드인데, 이 물질은 단위체가 아미노산이므로 단백질입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "이 물질은 탄소·수소·산소·질소에 더해 인(P)까지 구성 원소로 포함하며, 인산·당·염기가 1:1:1로 결합한 뉴클레오타이드가 기본 단위체이다.",
+        "opts": [
+          {
+            "t": "핵산",
+            "c": true,
+            "f": "질소에 더해 인까지 포함하고 뉴클레오타이드를 단위체로 하는 것은 핵산의 특징입니다."
+          },
+          {
+            "t": "단백질",
+            "c": false,
+            "f": "단백질은 인을 구성 원소로 포함하지 않는데, 이 물질은 인을 포함하므로 핵산입니다."
+          },
+          {
+            "t": "탄수화물",
+            "c": false,
+            "f": "탄수화물은 질소나 인을 포함하지 않는데, 이 물질은 둘 다 포함하므로 핵산입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">인지질과 핵산의 공통점</span>에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "구성 원소로 인(P)을 포함한다",
+            "c": true,
+            "f": "인지질은 인산기를, 핵산은 뉴클레오타이드의 인산을 통해 둘 다 인을 구성 원소로 포함합니다."
+          },
+          {
+            "t": "단위체가 아미노산이다",
+            "c": false,
+            "f": "이건 단백질의 특징입니다."
+          },
+          {
+            "t": "탄소 고리 화합물 4개로 이루어진다",
+            "c": false,
+            "f": "이건 스테로이드의 특징입니다."
+          },
+          {
+            "t": "단당류 2분자가 결합한 형태이다",
+            "c": false,
+            "f": "이건 이당류의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">탄수화물과 단백질의 차이점</span>에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "단백질만 분자 안에 질소(N)를 포함한다",
+            "c": true,
+            "f": "탄수화물은 질소를 포함하지 않지만 단백질은 질소를 포함한다는 점이 다릅니다."
+          },
+          {
+            "t": "단백질만 생물체의 에너지원으로 쓰일 수 있다",
+            "c": false,
+            "f": "탄수화물도 에너지원으로 쓰일 수 있다는 공통점이 있습니다."
+          },
+          {
+            "t": "탄수화물만 탄소를 기본 골격으로 한다",
+            "c": false,
+            "f": "단백질도 탄소를 기본 골격으로 하는 유기화합물입니다."
+          },
+          {
+            "t": "탄수화물만 단위체가 반복 연결된 구조이다",
+            "c": false,
+            "f": "단백질도 아미노산이 반복 연결된 사슬 구조입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">탄수화물과 지질의 공통점</span>에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "탄소(C), 수소(H), 산소(O)로 이루어져 있다",
+            "c": true,
+            "f": "두 물질 모두 탄소·수소·산소로 이루어진다는 공통점이 있습니다."
+          },
+          {
+            "t": "모두 아미노산이 기본 단위체이다",
+            "c": false,
+            "f": "이건 단백질의 특징입니다."
+          },
+          {
+            "t": "모두 인(P)을 구성 원소로 포함한다",
+            "c": false,
+            "f": "이건 핵산과 인지질(지질의 일부)의 특징입니다."
+          },
+          {
+            "t": "모두 유전정보를 저장한다",
+            "c": false,
+            "f": "이건 핵산의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "이 물질과 단백질은 모두 질소(N)를 포함하는 고분자 화합물이지만, 이 물질만 구성 원소로 인(P)을 포함한다.",
+        "opts": [
+          {
+            "t": "핵산",
+            "c": true,
+            "f": "질소를 포함한다는 점은 단백질과 같지만, 인까지 포함한다는 점이 다르므로 핵산입니다."
+          },
+          {
+            "t": "단백질",
+            "c": false,
+            "f": "단백질은 인을 포함하지 않는데, 이 물질은 인을 포함하므로 핵산입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">탄수화물·지질·단백질·핵산 네 물질 모두의 공통점</span>에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "모두 탄소(C)를 기본 골격으로 하는 유기화합물이다",
+            "c": true,
+            "f": "네 물질 모두 탄소를 기본 골격으로 하는 탄소 화합물이라는 공통점이 있습니다."
+          },
+          {
+            "t": "모두 아미노산을 기본 단위체로 한다",
+            "c": false,
+            "f": "이건 단백질만의 특징입니다."
+          },
+          {
+            "t": "모두 물에 잘 녹는다",
+            "c": false,
+            "f": "지질처럼 물에 잘 녹지 않는 물질도 있습니다."
+          },
+          {
+            "t": "모두 유전정보를 저장하는 기능을 한다",
+            "c": false,
+            "f": "이건 핵산만의 기능입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">핵산</span>의 단위체 구조에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "당 1분자, 염기 1분자, 인산 1분자가 하나로 뭉쳐 만들어진 단위가 사슬처럼 길게 이어진 구조이다",
+            "c": true,
+            "f": "당·염기·인산이 하나씩 결합한 뉴클레오타이드가 반복적으로 연결되어 사슬을 이루는 것이 핵산의 단위체 구조입니다."
+          },
+          {
+            "t": "단당류가 반복 연결된다",
+            "c": false,
+            "f": "이건 다당류의 단위체 구조입니다."
+          },
+          {
+            "t": "아미노산이 펩타이드결합으로 반복 연결된다",
+            "c": false,
+            "f": "이건 단백질의 단위체 구조입니다."
+          },
+          {
+            "t": "글리세롤과 지방산이 결합한다",
+            "c": false,
+            "f": "이건 중성지방의 결합 구조입니다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "B",
+    "code": "[세포 연구 방법]",
+    "name": "세포의 연구 방법",
+    "items": [
+      {
+        "dir": "fwd",
+        "prompt": "이 방법은 가시광선을 이용해 시료를 관찰하며, 최대 배율은 약 1000배 정도이고 살아 있는 세포도 그대로 관찰할 수 있다는 장점이 있다.",
+        "opts": [
+          {
+            "t": "광학현미경",
+            "c": true,
+            "f": "가시광선을 이용하고 살아 있는 세포를 관찰할 수 있는 것은 광학현미경의 특징입니다."
+          },
+          {
+            "t": "투과 전자 현미경",
+            "c": false,
+            "f": "투과 전자 현미경은 전자선을 이용하며 시료 준비 과정에서 세포가 죽는데, 이 설명은 살아 있는 세포를 가시광선으로 관찰한다고 했으므로 광학현미경입니다."
+          },
+          {
+            "t": "세포분획법",
+            "c": false,
+            "f": "세포분획법은 세포를 부수어 원심분리하는 방법인데, 이 설명은 빛으로 세포를 직접 관찰하는 방법이므로 광학현미경입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">광학현미경(형광현미경)</span>의 특징에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "살아 있는 세포의 특정 소기관만 형광 물질로 표지해 선택적으로 뚜렷하게 관찰할 수 있다",
+            "c": true,
+            "f": "형광 물질을 이용해 특정 구조를 선택적으로 관찰하는 것은 광학현미경(형광현미경)의 특징입니다."
+          },
+          {
+            "t": "금속으로 코팅한 시료 표면에 전자선을 주사해 입체 영상을 얻는다",
+            "c": false,
+            "f": "이건 주사 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "방사성 동위원소를 추적해 물질의 이동 경로를 알아낸다",
+            "c": false,
+            "f": "이건 자기방사법의 특징입니다."
+          },
+          {
+            "t": "회전 속도와 시간을 달리해 세포소기관을 분리한다",
+            "c": false,
+            "f": "이건 세포분획법의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "물질마다 빛이 굴절되는 정도가 다른 성질을 이용하기 때문에, 세포를 염색하지 않고도 구조를 뚜렷하게 관찰할 수 있는 현미경이다.",
+        "opts": [
+          {
+            "t": "광학현미경",
+            "c": true,
+            "f": "빛의 굴절률 차이를 이용해 무염색으로 세포를 관찰하는 위상차현미경은 광학현미경의 한 종류입니다."
+          },
+          {
+            "t": "투과 전자 현미경",
+            "c": false,
+            "f": "투과 전자 현미경은 전자선을 이용해 시료 단면을 관찰하는데, 이 설명은 빛의 굴절을 이용한 관찰이므로 광학현미경입니다."
+          },
+          {
+            "t": "세포분획법",
+            "c": false,
+            "f": "세포분획법은 원심분리로 세포소기관을 분리하는 방법인데, 이 설명은 현미경으로 세포를 직접 관찰하는 것이므로 광학현미경입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "얇게 자른 시료의 단면에 전자선을 투과시켜 확대된 영상을 얻는 방법으로, 시료 준비 과정에서 세포가 죽기 때문에 살아 있는 세포는 관찰할 수 없다.",
+        "opts": [
+          {
+            "t": "투과 전자 현미경",
+            "c": true,
+            "f": "시료 단면에 전자선을 투과시켜 내부 구조를 관찰하는 것은 투과 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "주사 전자 현미경",
+            "c": false,
+            "f": "주사 전자 현미경은 시료 표면에 전자선을 주사해 입체 영상을 얻는데, 이 설명은 전자선이 시료를 투과하는 방식이므로 투과 전자 현미경입니다."
+          },
+          {
+            "t": "광학현미경",
+            "c": false,
+            "f": "광학현미경은 가시광선을 이용해 살아 있는 세포도 관찰할 수 있는데, 이 설명은 전자선이 시료를 투과하며 세포가 죽는 방식이므로 투과 전자 현미경입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">투과 전자 현미경</span>의 특징에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "상이 흑백으로만 나타나며, 얇게 자른 시료 단면의 미세한 내부 구조를 관찰하는 데 적합하다",
+            "c": true,
+            "f": "흑백 영상으로 시료 단면의 미세 구조를 관찰하는 것은 투과 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "시료의 자연스러운 색을 그대로 볼 수 있다",
+            "c": false,
+            "f": "이건 광학현미경의 특징입니다."
+          },
+          {
+            "t": "시료 표면을 입체적으로 보여준다",
+            "c": false,
+            "f": "이건 주사 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "방사선을 필름에 감광시켜 물질의 위치를 추적한다",
+            "c": false,
+            "f": "이건 자기방사법의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "금속으로 코팅한 시료 표면에 전자선을 주사한 뒤, 반사되어 나오는 전자를 검출해 시료 표면의 입체적인 형태를 관찰하는 방법이다.",
+        "opts": [
+          {
+            "t": "주사 전자 현미경",
+            "c": true,
+            "f": "시료 표면을 금속으로 코팅하고 전자선을 주사해 입체 영상을 얻는 것은 주사 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "투과 전자 현미경",
+            "c": false,
+            "f": "투과 전자 현미경은 시료 단면을 전자선이 투과하며 내부 구조를 보는데, 이 설명은 표면에서 반사된 전자를 검출하는 방식이므로 주사 전자 현미경입니다."
+          },
+          {
+            "t": "광학현미경",
+            "c": false,
+            "f": "광학현미경은 가시광선으로 세포 내부를 관찰하는데, 이 설명은 전자선으로 시료 표면의 입체 영상을 얻는 것이므로 주사 전자 현미경입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">주사 전자 현미경</span>의 특징에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "시료의 겉모습이나 표면 구조를 수십만 배 배율로 입체적으로 보여준다",
+            "c": true,
+            "f": "시료 표면의 입체적인 형태를 연구하는 것은 주사 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "시료 단면의 내부 구조를 흑백 영상으로 보여준다",
+            "c": false,
+            "f": "이건 투과 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "원심분리로 세포소기관을 크기와 밀도별로 나눈다",
+            "c": false,
+            "f": "이건 세포분획법의 특징입니다."
+          },
+          {
+            "t": "살아 있는 세포를 가시광선으로 직접 관찰한다",
+            "c": false,
+            "f": "이건 광학현미경의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "방사성 동위원소로 표지된 아미노산을 세포에 공급한 뒤, 시간에 따라 거친면소포체·골지체·분비 소낭에서 검출되는 방사선의 양 변화를 추적해 단백질이 합성되어 이동하는 경로를 알아냈다.",
+        "opts": [
+          {
+            "t": "자기방사법",
+            "c": true,
+            "f": "방사성 동위원소를 추적해 세포 안 물질의 이동 경로를 알아내는 것은 자기방사법의 특징입니다."
+          },
+          {
+            "t": "세포분획법",
+            "c": false,
+            "f": "세포분획법은 세포를 부수어 원심분리로 소기관을 분리하는 방법인데, 이 설명은 살아 있는 경로를 시간에 따라 추적한 것이므로 자기방사법입니다."
+          },
+          {
+            "t": "주사 전자 현미경",
+            "c": false,
+            "f": "주사 전자 현미경은 시료 표면의 형태를 관찰하는데, 이 설명은 방사선을 추적해 물질의 이동 경로를 알아낸 것이므로 자기방사법입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "박테리오파지의 단백질과 DNA를 각각 다른 방사성 동위원소로 표지하여 대장균에 감염시킨 뒤, 대장균 안으로 들어가는 물질을 추적해 유전물질의 정체를 밝혀냈다.",
+        "opts": [
+          {
+            "t": "자기방사법",
+            "c": true,
+            "f": "방사성 동위원소로 표지한 물질을 추적해 그 정체나 경로를 알아내는 것은 자기방사법의 특징입니다."
+          },
+          {
+            "t": "투과 전자 현미경",
+            "c": false,
+            "f": "투과 전자 현미경은 시료 단면의 구조를 직접 확대해서 보는 방법인데, 이 설명은 방사선을 추적해 물질의 정체를 알아낸 것이므로 자기방사법입니다."
+          },
+          {
+            "t": "광학현미경",
+            "c": false,
+            "f": "광학현미경은 가시광선으로 세포를 직접 관찰하는데, 이 설명은 방사성 동위원소를 추적한 실험이므로 자기방사법입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "세포나 조직을 균질기로 부수어 얻은 파쇄액을 원심분리기에 넣고, 회전 속도와 시간을 점차 늘려 가며 회전시켜 세포소기관을 크기와 밀도에 따라 단계적으로 가라앉혀 분리했다.",
+        "opts": [
+          {
+            "t": "세포분획법",
+            "c": true,
+            "f": "세포 파쇄액을 원심분리기로 회전시켜 세포소기관을 크기와 밀도에 따라 분리하는 것은 세포분획법의 특징입니다."
+          },
+          {
+            "t": "자기방사법",
+            "c": false,
+            "f": "자기방사법은 방사성 동위원소를 추적하는 방법인데, 이 설명은 원심분리기로 물질을 분리하는 것이므로 세포분획법입니다."
+          },
+          {
+            "t": "주사 전자 현미경",
+            "c": false,
+            "f": "주사 전자 현미경은 표면을 전자선으로 관찰하는 방법인데, 이 설명은 세포를 부수어 원심분리하는 것이므로 세포분획법입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">세포분획법</span>의 결과에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "세포벽이 제거된 식물 세포를 분리하면 핵 다음으로 엽록체, 마이토콘드리아, 세포막·소포체 조각, 라이보솜 순서로 가라앉는다",
+            "c": true,
+            "f": "회전 속도와 시간에 따라 세포소기관이 순서대로 침전되는 것은 세포분획법의 결과입니다."
+          },
+          {
+            "t": "시료 단면을 확대해 세포 내부 구조를 직접 관찰한다",
+            "c": false,
+            "f": "이건 투과 전자 현미경의 결과입니다."
+          },
+          {
+            "t": "방사선을 추적해 물질이 이동한 경로를 알아낸다",
+            "c": false,
+            "f": "이건 자기방사법의 결과입니다."
+          },
+          {
+            "t": "시료 표면을 입체적인 영상으로 보여준다",
+            "c": false,
+            "f": "이건 주사 전자 현미경의 결과입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">투과 전자 현미경(TEM)</span>의 특징에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "얇게 자른 시료 단면에 전자선을 투과시켜 세포 내부의 미세 구조를 관찰한다",
+            "c": true,
+            "f": "시료 단면에 전자선을 투과시켜 내부 구조를 보는 것은 투과 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "금속으로 코팅한 시료 표면에 전자선을 주사해 입체 영상을 얻는다",
+            "c": false,
+            "f": "이건 주사 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "가시광선을 이용하며 살아 있는 세포를 그대로 관찰할 수 있다",
+            "c": false,
+            "f": "이건 광학현미경의 특징입니다."
+          },
+          {
+            "t": "방사성 동위원소로 표지한 물질을 추적해 이동 경로를 알아낸다",
+            "c": false,
+            "f": "이건 자기방사법의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">세포분획법</span>의 특징에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "균질기로 곱게 갈아 만든 세포 추출물을 원심분리기에 돌리면, 무겁고 큰 성분부터 먼저 가라앉고 가볍고 작은 성분은 나중에 가라앉는 원리로 소기관들이 단계별로 나뉜다",
+            "c": true,
+            "f": "무겁고 큰 세포소기관부터 먼저, 가볍고 작은 것은 나중에 가라앉는 원리로 소기관을 분리하는 것이 세포분획법의 특징입니다."
+          },
+          {
+            "t": "시료 표면을 금속으로 코팅해 입체적인 표면 영상을 얻는다",
+            "c": false,
+            "f": "이건 주사 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "물질에 따른 빛의 굴절률 차이를 이용해 염색 없이 세포를 관찰한다",
+            "c": false,
+            "f": "이건 광학현미경(위상차현미경)의 특징입니다."
+          },
+          {
+            "t": "방사성 동위원소로 표지된 아미노산을 공급해 단백질의 이동 경로를 추적한다",
+            "c": false,
+            "f": "이건 자기방사법의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">광학현미경</span>의 특징에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "가시광선을 이용하며 살아 있는 세포도 관찰할 수 있다",
+            "c": true,
+            "f": "가시광선을 이용해 살아 있는 세포를 관찰할 수 있는 것은 광학현미경의 특징입니다."
+          },
+          {
+            "t": "얇게 자른 시료 단면에 전자선을 투과시켜 미세 구조를 관찰한다",
+            "c": false,
+            "f": "이건 투과 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "세포 파쇄액을 원심분리기로 회전시켜 소기관을 분리한다",
+            "c": false,
+            "f": "이건 세포분획법의 특징입니다."
+          },
+          {
+            "t": "전자선을 시료 표면에 주사해 입체 영상을 얻는다",
+            "c": false,
+            "f": "이건 주사 전자 현미경의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">자기방사법</span>의 특징에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "방사성 동위원소로 표지한 물질을 추적하여 세포 안에서 물질이 이동하는 경로를 알아낸다",
+            "c": true,
+            "f": "방사성 동위원소를 추적해 물질의 이동 경로를 확인하는 것은 자기방사법의 특징입니다."
+          },
+          {
+            "t": "시료를 얇게 잘라 전자선을 투과시켜 내부 구조를 확대해서 본다",
+            "c": false,
+            "f": "이건 투과 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "시료 표면을 금속으로 코팅한 뒤 전자선을 주사한다",
+            "c": false,
+            "f": "이건 주사 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "세포를 균질기로 부수어 원심분리기에 넣고 회전시킨다",
+            "c": false,
+            "f": "이건 세포분획법의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">주사 전자 현미경(SEM)</span>의 특징에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "금속으로 코팅한 시료 표면에 전자선을 주사하여 입체적인 표면 영상을 얻는다",
+            "c": true,
+            "f": "시료 표면을 금속으로 코팅해 입체 영상을 얻는 것은 주사 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "얇게 자른 시료 단면에 전자선을 투과시켜 내부의 미세 구조를 관찰한다",
+            "c": false,
+            "f": "이건 투과 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "가시광선을 이용해 시료의 자연스러운 색상을 관찰한다",
+            "c": false,
+            "f": "이건 광학현미경의 특징입니다."
+          },
+          {
+            "t": "회전 속도와 시간을 달리하여 세포소기관을 침전시켜 분리한다",
+            "c": false,
+            "f": "이건 세포분획법의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "이 방법은 최대 배율이 약 1000배이고, 서로 가까이 있는 두 점을 구별할 수 있는 최소 거리(해상력)가 약 0.2µm이다.",
+        "opts": [
+          {
+            "t": "광학현미경",
+            "c": true,
+            "f": "최대 배율 약 1000배, 해상력 약 0.2µm은 광학현미경의 특징입니다."
+          },
+          {
+            "t": "투과 전자 현미경",
+            "c": false,
+            "f": "투과 전자 현미경은 배율이 수백만 배, 해상력이 약 0.2nm로 훨씬 뛰어난데, 이 설명은 배율·해상력이 훨씬 낮으므로 광학현미경입니다."
+          },
+          {
+            "t": "주사 전자 현미경",
+            "c": false,
+            "f": "주사 전자 현미경은 배율이 수십만 배 정도로 훨씬 높은데, 이 설명은 배율이 약 1000배에 그치므로 광학현미경입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "가시광선보다 파장이 훨씬 짧은 광원을 이용해, 광학현미경보다 훨씬 뛰어난 해상력으로 세포의 미세 구조까지 관찰할 수 있는 현미경 계열이다.",
+        "opts": [
+          {
+            "t": "전자현미경",
+            "c": true,
+            "f": "파장이 짧은 전자선을 광원으로 이용해 해상력을 크게 높인 것은 전자현미경(투과·주사)의 공통적인 특징입니다."
+          },
+          {
+            "t": "광학현미경",
+            "c": false,
+            "f": "광학현미경은 가시광선을 광원으로 이용해 전자현미경보다 해상력이 낮은데, 이 설명은 훨씬 짧은 파장의 광원을 쓴다고 했으므로 전자현미경입니다."
+          },
+          {
+            "t": "자기방사법",
+            "c": false,
+            "f": "자기방사법은 광원을 이용한 관찰법이 아니라 방사선을 추적하는 방법인데, 이 설명은 광원의 파장에 대한 것이므로 전자현미경입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "원심분리기의 회전 속도를 느리게 하고 시간을 짧게 하면 상대적으로 크고 무거운 세포소기관이 먼저 가라앉아 분리되고, 회전 속도를 높이고 시간을 늘리면 점차 작고 가벼운 세포소기관이 나중에 가라앉아 분리된다.",
+        "opts": [
+          {
+            "t": "세포분획법",
+            "c": true,
+            "f": "회전 속도와 시간에 따라 세포소기관이 크기·밀도 순서로 단계적으로 침전되는 원리는 세포분획법의 특징입니다."
+          },
+          {
+            "t": "자기방사법",
+            "c": false,
+            "f": "자기방사법은 방사성 동위원소를 추적하는 방법인데, 이 설명은 원심분리 속도·시간에 따른 침전 순서에 대한 것이므로 세포분획법입니다."
+          },
+          {
+            "t": "투과 전자 현미경",
+            "c": false,
+            "f": "투과 전자 현미경은 시료 단면을 전자선으로 직접 관찰하는 방법인데, 이 설명은 원심분리로 물질을 분리하는 것이므로 세포분획법입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "방사성 동위원소로 표지된 이산화 탄소를 식물 세포에 공급한 뒤, 시간에 따라 어떤 화합물에서 방사선이 검출되는지를 추적해 포도당이 합성되는 광합성 경로를 알아냈다.",
+        "opts": [
+          {
+            "t": "자기방사법",
+            "c": true,
+            "f": "방사성 동위원소를 추적해 물질대사 경로를 알아내는 것은 자기방사법의 특징입니다."
+          },
+          {
+            "t": "세포분획법",
+            "c": false,
+            "f": "세포분획법은 세포를 부수어 원심분리로 소기관을 분리하는 방법인데, 이 설명은 살아 있는 세포에서 물질의 이동 경로를 시간에 따라 추적한 것이므로 자기방사법입니다."
+          },
+          {
+            "t": "광학현미경",
+            "c": false,
+            "f": "광학현미경은 가시광선으로 세포를 직접 관찰하는 방법인데, 이 설명은 방사선을 추적한 것이므로 자기방사법입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">전자현미경(TEM·SEM 공통)</span>의 특징에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "광학현미경보다 훨씬 높은 해상력으로 세포의 미세 구조를 관찰할 수 있지만, 시료 준비 과정에서 세포가 죽어 살아 있는 상태로는 관찰할 수 없다",
+            "c": true,
+            "f": "짧은 파장의 전자선을 이용해 해상력은 높지만 살아 있는 세포는 관찰할 수 없는 것은 전자현미경(TEM·SEM)의 공통적인 특징입니다."
+          },
+          {
+            "t": "가시광선을 이용하며 살아 있는 세포를 그대로 관찰할 수 있다",
+            "c": false,
+            "f": "이건 광학현미경의 특징입니다."
+          },
+          {
+            "t": "세포 파쇄액을 원심분리기에 넣고 회전시켜 세포소기관을 분리한다",
+            "c": false,
+            "f": "이건 세포분획법의 특징입니다."
+          },
+          {
+            "t": "방사성 동위원소로 표지한 물질을 추적해 이동 경로를 알아낸다",
+            "c": false,
+            "f": "이건 자기방사법의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "동물 세포를 이 방법으로 분리하면 핵 다음으로 마이토콘드리아가 가라앉고, 이어서 세포막과 소포체 조각, 마지막으로 라이보솜 순서로 침전된다.",
+        "opts": [
+          {
+            "t": "세포분획법",
+            "c": true,
+            "f": "회전 속도와 시간에 따라 세포소기관이 순서대로 침전되어 분리되는 것은 세포분획법의 결과입니다."
+          },
+          {
+            "t": "투과 전자 현미경",
+            "c": false,
+            "f": "투과 전자 현미경은 시료 단면 구조를 직접 확대해 보는 방법인데, 이 설명은 원심분리 침전 순서에 대한 것이므로 세포분획법입니다."
+          },
+          {
+            "t": "자기방사법",
+            "c": false,
+            "f": "자기방사법은 방사선을 추적해 물질의 이동 경로를 확인하는 방법인데, 이 설명은 원심분리로 소기관이 가라앉는 순서이므로 세포분획법입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">광학현미경</span>의 특징에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "시료의 자연스러운 색을 그대로 볼 수 있고, 염색하면 구조를 더 뚜렷하게 관찰할 수 있다",
+            "c": true,
+            "f": "가시광선을 이용해 자연스러운 색상을 관찰하고 염색으로 구조를 뚜렷하게 볼 수 있는 것은 광학현미경의 특징입니다."
+          },
+          {
+            "t": "상이 흑백으로만 나타난다",
+            "c": false,
+            "f": "이건 전자현미경(TEM·SEM)의 특징입니다."
+          },
+          {
+            "t": "세포를 파쇄해 원심분리기에 넣고 분리한다",
+            "c": false,
+            "f": "이건 세포분획법의 특징입니다."
+          },
+          {
+            "t": "방사성 동위원소로 물질의 이동 경로를 추적한다",
+            "c": false,
+            "f": "이건 자기방사법의 특징입니다."
+          }
+        ]
+      },
+      {
+        "dir": "rev",
+        "label": "다음 중 <span class=\"target\">자기방사법</span>의 사례에 해당하는 것을 고르시오.",
+        "prompt": "",
+        "opts": [
+          {
+            "t": "조류(藻類)나 식물에 14C로 표지한 이산화 탄소를 흡수시킨 뒤, 이 방사성 탄소가 어떤 중간 산물들을 거쳐 최종 물질에 도달하는지 시간차를 두고 추적한다",
+            "c": true,
+            "f": "방사성 동위원소로 표지한 물질이 시간에 따라 어떤 화합물을 거쳐 이동하는지 추적하는 것은 자기방사법의 사례입니다(캘빈의 광합성 경로 규명 실험 등)."
+          },
+          {
+            "t": "세포 파쇄액을 원심분리기에 넣고 회전시켜 세포소기관을 크기·밀도별로 분리한다",
+            "c": false,
+            "f": "이건 세포분획법의 사례입니다."
+          },
+          {
+            "t": "금속으로 코팅한 시료 표면에 전자선을 주사해 입체 영상을 얻는다",
+            "c": false,
+            "f": "이건 주사 전자 현미경의 사례입니다."
+          },
+          {
+            "t": "가시광선을 이용해 살아 있는 세포의 모양과 크기를 관찰한다",
+            "c": false,
+            "f": "이건 광학현미경의 사례입니다."
+          }
+        ]
+      },
+      {
+        "dir": "fwd",
+        "prompt": "이 현미경은 수백만 배까지 확대할 수 있어 라이보솜처럼 매우 작은 구조까지 관찰할 수 있으며, 최대 배율이 약 1000배에 그치는 광학현미경으로는 볼 수 없는 세포 내부의 미세 구조 연구에 특히 적합하다.",
+        "opts": [
+          {
+            "t": "투과 전자 현미경",
+            "c": true,
+            "f": "수백만 배의 배율로 라이보솜 같은 미세 구조를 관찰하고 내부 구조 연구에 적합한 것은 투과 전자 현미경의 특징입니다."
+          },
+          {
+            "t": "주사 전자 현미경",
+            "c": false,
+            "f": "주사 전자 현미경은 배율이 수십만 배 정도로 상대적으로 낮고 표면 관찰에 적합한데, 이 설명은 수백만 배로 내부 미세 구조를 본다고 했으므로 투과 전자 현미경입니다."
+          },
+          {
+            "t": "광학현미경",
+            "c": false,
+            "f": "광학현미경은 최대 배율이 약 1000배로 라이보솜을 관찰할 수 없는데, 이 설명은 라이보솜을 관찰할 수 있다고 했으므로 투과 전자 현미경입니다."
+          }
+        ]
+      }
+    ]
+  }
+];
+
+let curFw = null;
+let curFwId = null;
+let pendingFwId = null;
+let itemIdx = 0;
+let firstTryResults = [];
+let roundSeconds = 20;
+let timerInterval = null;
+let lastRoundIndices = {}; // 주제별 직전 라운드에 출제된 문항 인덱스 (다시 풀기 시 겹치지 않게)
+
+const STATS_KEY = 'metabolism_unit1_stats_v1';
+
+function loadStats(){
+  try{
+    const raw = localStorage.getItem(STATS_KEY);
+    if(!raw) return frameworks.map(()=>({correct:0,total:0}));
+    const saved = JSON.parse(raw);
+    return frameworks.map(fw=>{
+      const found = saved && saved[fw.id];
+      return (found && typeof found.correct==='number' && typeof found.total==='number')
+        ? {correct: found.correct, total: found.total}
+        : {correct:0, total:0};
+    });
+  } catch(e){
+    return frameworks.map(()=>({correct:0,total:0}));
+  }
+}
+
+function saveStats(){
+  try{
+    const obj = {};
+    frameworks.forEach((fw,i)=>{ obj[fw.id] = sessionStats[i]; });
+    localStorage.setItem(STATS_KEY, JSON.stringify(obj));
+  } catch(e){
+    // 저장 실패(예: 프라이빗 모드)해도 학습 자체는 계속 진행되도록 조용히 무시
+  }
+}
+
+function resetStats(){
+  if(!confirm('지금까지 쌓인 학습 기록을 전부 초기화할까요? 되돌릴 수 없어요.')) return;
+  sessionStats = frameworks.map(()=>({correct:0,total:0}));
+  try{ localStorage.removeItem(STATS_KEY); } catch(e){}
+  renderStats();
+}
+
+let sessionStats = loadStats();
+
+function renderTabs(){
+  const bar = document.getElementById('tabBar');
+  bar.innerHTML = '';
+  frameworks.forEach(fw=>{
+    const d = document.createElement('div');
+    d.className = 'tab';
+    d.onclick = ()=>openDifficultyScreen(fw.id);
+    d.innerHTML = `<span class="name">${fw.name}</span>`;
+    bar.appendChild(d);
+  });
+}
+
+const ROUND_SIZE = {A:7, B:5};
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function openDifficultyScreen(id){
+  pendingFwId = id;
+  const fw = frameworks.find(f=>f.id===id);
+  document.getElementById('diffTitle').textContent = `${fw.name} · 시간 설정`;
+  document.getElementById('tabBar').classList.add('hidden');
+  document.getElementById('itemScreen').classList.add('hidden');
+  document.getElementById('summaryScreen').classList.add('hidden');
+  document.getElementById('difficultyScreen').classList.remove('hidden');
+  document.getElementById('diffSlider').value = 15;
+  updateDiffDisplay();
+}
+
+function updateDiffDisplay(){
+  const slider = document.getElementById('diffSlider');
+  const v = parseInt(slider.value, 10);
+  const pct = ((v - 5) / (30 - 5)) * 100;
+  let color, label;
+  if(v <= 10){ color = '#C4453E'; label = '빠른 판단 연습'; }
+  else if(v <= 20){ color = '#E0A64A'; label = '표준 속도'; }
+  else { color = '#4CAF6E'; label = '여유롭게 생각하기'; }
+  slider.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #3A4530 ${pct}%, #3A4530 100%)`;
+  const valueEl = document.getElementById('diffValue');
+  valueEl.textContent = v + '초';
+  valueEl.style.color = color;
+  document.getElementById('diffLabel').textContent = label;
+}
+
+function confirmDifficulty(){
+  const v = parseInt(document.getElementById('diffSlider').value, 10);
+  startFramework(pendingFwId, v);
+}
+
+function itemTopic(item){
+  // 문항이 다루는 '소재'를 정답 카테고리(정방향) 또는 target 라벨(역방향)에서 추출
+  if(item.dir === 'fwd'){
+    const correct = item.opts.find(o=>o.c);
+    return correct ? correct.t : 'unknown';
+  }
+  const m = item.label.match(/<span class="target">(.*?)<\/span>/);
+  return m ? m[1] : item.label;
+}
+
+function pickBalancedRound(base, id, size){
+  const allIdx = base.items.map((_,i)=>i);
+  const prevUsed = new Set(lastRoundIndices[id] || []);
+  let pool = allIdx.filter(i => !prevUsed.has(i));
+  if(pool.length < size) pool = allIdx.slice(); // 안전장치(현재 뱅크 규모상 발생하지 않음)
+
+  // 소재별로 그룹화(같은 소재를 한 회차에 중복 출제하지 않기 위함), 그룹 내부는 방향별로 분리
+  const byTopic = {};
+  pool.forEach(i => {
+    const t = itemTopic(base.items[i]);
+    if(!byTopic[t]) byTopic[t] = {fwd:[], rev:[]};
+    byTopic[t][base.items[i].dir].push(i);
+  });
+  Object.values(byTopic).forEach(g => { g.fwd = shuffle(g.fwd); g.rev = shuffle(g.rev); });
+
+  let topics = shuffle(Object.keys(byTopic));
+  const chosen = [];
+  let fwdCount = 0, revCount = 0;
+  const targetFwd = Math.ceil(size / 2);
+  let ti = 0, guard = 0;
+
+  while(chosen.length < size && guard < 1000){
+    guard++;
+    if(ti >= topics.length){
+      // 모든 소재를 한 바퀴 돌았는데 아직 부족하면(주제 수가 출제 수보다 적을 때) 남은 소재로 다시 순회
+      topics = shuffle(topics.filter(t => byTopic[t].fwd.length + byTopic[t].rev.length > 0));
+      ti = 0;
+      if(topics.length === 0) break;
+    }
+    const g = byTopic[topics[ti]];
+    const wantFwd = fwdCount < targetFwd;
+    let pickedIdx = null;
+    if(wantFwd && g.fwd.length) pickedIdx = g.fwd.shift();
+    else if(!wantFwd && g.rev.length) pickedIdx = g.rev.shift();
+    else if(g.fwd.length) pickedIdx = g.fwd.shift();
+    else if(g.rev.length) pickedIdx = g.rev.shift();
+
+    if(pickedIdx !== null){
+      chosen.push(pickedIdx);
+      if(base.items[pickedIdx].dir === 'fwd') fwdCount++; else revCount++;
+    }
+    ti++;
+  }
+
+  const chosenIdx = shuffle(chosen);
+  lastRoundIndices[id] = chosenIdx.slice();
+  return chosenIdx.map(i => base.items[i]);
+}
+
+function startFramework(id, seconds){
+  roundSeconds = seconds;
+  const base = frameworks.find(f=>f.id===id);
+  curFw = {
+    ...base,
+    items: pickBalancedRound(base, id, ROUND_SIZE[id]).map(it => ({...it, opts: shuffle(it.opts)}))
+  };
+  curFwId = id;
+  itemIdx = 0;
+  firstTryResults = [];
+  document.getElementById('difficultyScreen').classList.add('hidden');
+  document.getElementById('summaryScreen').classList.add('hidden');
+  document.getElementById('itemScreen').classList.remove('hidden');
+  renderItem();
+}
+
+// ---- 정답/오답 사운드 + 음소거 (규칙 9) ----
+let audioCtx = null;
+let isMuted = (localStorage.getItem('quizMuted') === '1');
+
+function getAudioCtx(){
+  if(!audioCtx){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AC();
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playTone(freq, duration, type, delay){
+  if(isMuted) return;
+  try{
+    const ctx = getAudioCtx();
+    const start = ctx.currentTime + (delay||0);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, start);
+    gain.gain.setValueAtTime(0.001, start);
+    gain.gain.exponentialRampToValueAtTime(0.16, start + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(start);
+    osc.stop(start + duration + 0.02);
+  }catch(e){}
+}
+
+function playCorrectSound(){
+  playTone(660, 0.11, 'sine', 0);
+  playTone(880, 0.16, 'sine', 0.08);
+}
+function playWrongSound(){
+  playTone(196, 0.22, 'square', 0);
+}
+
+function toggleMute(){
+  isMuted = !isMuted;
+  localStorage.setItem('quizMuted', isMuted ? '1' : '0');
+  updateMuteBtn();
+  if(!isMuted) getAudioCtx();
+}
+function updateMuteBtn(){
+  const btn = document.getElementById('muteBtn');
+  if(btn) btn.textContent = isMuted ? '🔇' : '🔊';
+}
+
+function showFeedbackIcon(btn, ok){
+  if(!btn) return;
+  const icon = document.createElement('div');
+  icon.className = 'fb-icon ' + (ok?'ok':'bad');
+  icon.textContent = ok ? '✓' : '✗';
+  btn.appendChild(icon);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>icon.classList.add('show')));
+}
+
+function goHome(){
+  clearInterval(timerInterval);
+  document.getElementById('tabBar').classList.remove('hidden');
+  document.getElementById('difficultyScreen').classList.add('hidden');
+  document.getElementById('itemScreen').classList.add('hidden');
+  document.getElementById('summaryScreen').classList.add('hidden');
+}
+
+function startTimer(onTimeout){
+  clearInterval(timerInterval);
+  let timeLeft = roundSeconds;
+  const fill = document.getElementById('timerBarFill');
+  const num = document.getElementById('timerNum');
+  const render = ()=>{
+    const pct = Math.max(0, (timeLeft/roundSeconds)*100);
+    fill.style.width = pct + '%';
+    fill.style.background = pct <= 25 ? 'var(--bad)' : (pct <= 55 ? 'var(--point)' : 'var(--good)');
+    num.textContent = timeLeft + '초';
+  };
+  fill.style.transition = 'none';
+  render();
+  fill.offsetHeight;
+  fill.style.transition = 'width 1s linear, background-color .3s';
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    if(timeLeft <= 0){
+      clearInterval(timerInterval);
+      timeLeft = 0;
+      render();
+      onTimeout();
+    } else {
+      render();
+    }
+  }, 1000);
+}
+
+function renderItem(){
+  const total = curFw.items.length;
+  const prog = document.getElementById('progress');
+  prog.innerHTML = '';
+  for(let i=0;i<total;i++){
+    const dd = document.createElement('div');
+    dd.className = 'pdot ' + (i<itemIdx?'done':(i===itemIdx?'current':''));
+    prog.appendChild(dd);
+  }
+  const item = curFw.items[itemIdx];
+  document.getElementById('promptLabel').textContent = `문제 ${itemIdx+1} / ${total} · ${curFw.name}`;
+  const ptext = document.getElementById('promptText');
+  if(item.dir === 'rev'){
+    ptext.innerHTML = item.label;
+  } else {
+    ptext.textContent = item.prompt;
+  }
+
+  const optsBox = document.getElementById('opts');
+  optsBox.innerHTML='';
+  document.getElementById('fbBox').innerHTML='';
+  document.getElementById('nextBtn').disabled = true;
+  let firstTry = null;
+  let locked = false;
+
+  function recordFirstTry(val){
+    if(firstTryResults[itemIdx]===undefined){
+      firstTryResults[itemIdx]=val;
+      const fwIdx = frameworks.findIndex(f=>f.id===curFwId);
+      sessionStats[fwIdx].total++;
+      if(val) sessionStats[fwIdx].correct++;
+      renderStats();
+      saveStats();
+    }
+  }
+
+  item.opts.forEach(o=>{
+    const b = document.createElement('button');
+    b.className='opt';
+    b.textContent = o.t;
+    b.onclick = ()=>{
+      if(locked) return;
+      if(firstTry===null) firstTry = o.c;
+      if(o.c){
+        locked = true;
+        clearInterval(timerInterval);
+        b.classList.add('correct');
+        Array.from(optsBox.children).forEach(ch=>ch.disabled=true);
+        document.getElementById('fbBox').innerHTML = `<div class="feedback ok">✓ ${o.f}</div>`;
+        document.getElementById('nextBtn').disabled=false;
+        recordFirstTry(firstTry);
+        showFeedbackIcon(b, true);
+        playCorrectSound();
+      } else {
+        b.classList.add('wrong');
+        b.disabled=true;
+        document.getElementById('fbBox').innerHTML = `<div class="feedback bad">✗ ${o.f}</div>`;
+        showFeedbackIcon(b, false);
+        playWrongSound();
+      }
+    };
+    optsBox.appendChild(b);
+  });
+
+  startTimer(()=>{
+    if(locked) return;
+    locked = true;
+    const correctBtn = Array.from(optsBox.children).find((_,idx)=>item.opts[idx].c);
+    Array.from(optsBox.children).forEach(ch=>ch.disabled=true);
+    if(correctBtn) correctBtn.classList.add('correct');
+    const correctOpt = item.opts.find(o=>o.c);
+    document.getElementById('fbBox').innerHTML = `<div class="feedback bad">⏱ 시간 초과! 정답은 "${correctOpt.t}"입니다. ${correctOpt.f}</div>`;
+    document.getElementById('nextBtn').disabled=false;
+    recordFirstTry(false);
+    if(correctBtn) showFeedbackIcon(correctBtn, true);
+    playWrongSound();
+  });
+}
+
+function nextItem(){
+  if(itemIdx < curFw.items.length-1){
+    itemIdx++;
+    renderItem();
+  } else {
+    showSummary();
+  }
+}
+
+function showSummary(){
+  document.getElementById('itemScreen').classList.add('hidden');
+  document.getElementById('summaryScreen').classList.remove('hidden');
+  document.getElementById('sumTitle').textContent = `"${curFw.name}" 결과`;
+  const rows = document.getElementById('sumRows');
+  rows.innerHTML='';
+  curFw.items.forEach((it,i)=>{
+    const ok = firstTryResults[i];
+    const r = document.createElement('div');
+    r.className='sumrow';
+    r.innerHTML = `<span>문항 ${i+1}</span><span class="mark ${ok?'ok':'bad'}">${ok?'✓ 한 번에 정답':'✗ 오답 경유'}</span>`;
+    rows.appendChild(r);
+  });
+}
+
+function renderStats(){
+  const grid = document.getElementById('statGrid');
+  grid.innerHTML='';
+  sessionStats.forEach((s,i)=>{
+    const pct = s.total? Math.round(100*s.correct/s.total) : null;
+    const cell = document.createElement('div');
+    cell.className='statcell';
+    cell.innerHTML = `<div class="n">${pct===null?'–':pct+'%'}</div><div class="l">${frameworks[i].id}. ${frameworks[i].name}</div>`;
+    grid.appendChild(cell);
+  });
+}
+
+renderTabs();
+renderStats();
+updateMuteBtn();
+</script>
+</body>
+</html>
