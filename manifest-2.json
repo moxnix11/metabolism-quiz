@@ -1,0 +1,13 @@
+{
+  "name": "세포의 구조와 기능 · 사고 훈련",
+  "short_name": "세포 구조",
+  "start_url": "./2단원_세포의구조와기능_사고훈련.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0E1420",
+  "theme_color": "#E056A0",
+  "icons": [
+    {"src": "icon-2-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "icon-2-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}

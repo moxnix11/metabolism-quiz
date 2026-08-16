@@ -6,6 +6,13 @@
 <title>생명체의 미시적 기초 · 사고 훈련</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#E0A64A">
+<link rel="manifest" href="manifest-1.json">
+<link rel="apple-touch-icon" href="icon-1-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="미시적 기초">
 <style>
   :root{
     --bg:#15190F;
@@ -766,9 +773,9 @@ const frameworks = [
         "prompt": "",
         "opts": [
           {
-            "t": "두 개의 폴리뉴클레오타이드 사슬이 서로 감겨 이중나선의 입체 구조를 만든다",
+            "t": "두 가닥의 폴리뉴클레오타이드가 나선 모양으로 꼬여 있다",
             "c": true,
-            "f": "두 가닥이 서로 감겨 이중나선 구조를 만드는 것은 DNA의 특징입니다."
+            "f": "두 가닥이 이중나선을 이루는 것은 DNA의 특징입니다."
           },
           {
             "t": "한 가닥으로 되어 있으며 유전정보를 전달한다",
@@ -793,9 +800,9 @@ const frameworks = [
         "prompt": "",
         "opts": [
           {
-            "t": "적혈구에서 산소를 운반하는 이 단백질은 각각 따로 만들어진 폴리펩타이드 사슬 네 가닥(두 종류가 두 개씩)이 한데 뭉쳐야 비로소 완전한 기능을 갖춘다",
+            "t": "산소 운반 단백질인 헤모글로빈처럼, 서로 다른 폴리펩타이드 사슬 4개가 모여 하나의 단백질을 완성한 상태",
             "c": true,
-            "f": "따로 만들어진 폴리펩타이드 사슬 여러 개가 모여야 완전한 단백질이 되는 것은 4차 구조(헤모글로빈)의 특징입니다."
+            "f": "폴리펩타이드가 2개 이상 모여 이루어진 구조이므로 4차 구조의 예입니다."
           },
           {
             "t": "아미노산 하나하나가 펩타이드결합으로 연결된 사슬 상태",
@@ -869,7 +876,7 @@ const frameworks = [
       },
       {
         "dir": "fwd",
-        "prompt": "혈액 속에서 산소를 운반하는 헤모글로빈의 β사슬은 아미노산 146개가 펩타이드결합으로 순서대로 연결된 사슬 그 자체이며, 아직 입체적으로 접히기 전 상태를 가리킨다.",
+        "prompt": "인슐린을 이루는 A사슬은 아미노산 21개가 펩타이드결합으로 순서대로 연결된 사슬 그 자체이며, 아직 입체적으로 접히기 전 상태를 가리킨다.",
         "opts": [
           {
             "t": "1차 구조",
@@ -894,9 +901,9 @@ const frameworks = [
         "prompt": "",
         "opts": [
           {
-            "t": "눈물이나 침 속에도 들어있는 이 항균 단백질은, 한 가닥짜리 폴리펩타이드가 스스로 접혀 세균 세포벽을 자르는 부위를 만들어 낸 상태를 가리킨다",
+            "t": "세균의 세포벽을 분해하는 라이소자임처럼, 폴리펩타이드 사슬 1개가 접혀 독립적인 입체 구조를 완성한 상태",
             "c": true,
-            "f": "폴리펩타이드 사슬 1개가 접혀 독립적인 입체 구조(세균 세포벽을 자르는 부위 포함)를 만드는 것은 3차 구조(라이소자임)의 예입니다."
+            "f": "폴리펩타이드 1개가 접혀 입체 구조를 이루는 것이므로 3차 구조의 예입니다."
           },
           {
             "t": "산소 운반 단백질인 헤모글로빈처럼, 서로 다른 폴리펩타이드 사슬 여러 개가 모여 하나의 단백질을 이룬 상태",
@@ -1017,9 +1024,9 @@ const frameworks = [
         "prompt": "",
         "opts": [
           {
-            "t": "탄소(C), 수소(H), 산소(O)로 이루어져 있다",
+            "t": "탄소(C), 수소(H), 산소(O)로만 이루어져 있다",
             "c": true,
-            "f": "두 물질 모두 탄소·수소·산소로 이루어진다는 공통점이 있습니다."
+            "f": "두 물질 모두 탄소·수소·산소만으로 이루어진다는 공통점이 있습니다."
           },
           {
             "t": "모두 아미노산이 기본 단위체이다",
@@ -1040,7 +1047,7 @@ const frameworks = [
       },
       {
         "dir": "fwd",
-        "prompt": "이 물질과 단백질은 모두 질소(N)를 포함하는 고분자 화합물이지만, 이 물질만 구성 원소로 인(P)을 포함한다.",
+        "prompt": "핵산과 단백질은 모두 질소(N)를 포함하는 고분자 화합물이지만, 이 물질만 구성 원소로 인(P)을 포함한다.",
         "opts": [
           {
             "t": "핵산",
@@ -1087,9 +1094,9 @@ const frameworks = [
         "prompt": "",
         "opts": [
           {
-            "t": "당 1분자, 염기 1분자, 인산 1분자가 하나로 뭉쳐 만들어진 단위가 사슬처럼 길게 이어진 구조이다",
+            "t": "인산·당·염기가 1:1:1로 결합한 뉴클레오타이드가 반복 연결된다",
             "c": true,
-            "f": "당·염기·인산이 하나씩 결합한 뉴클레오타이드가 반복적으로 연결되어 사슬을 이루는 것이 핵산의 단위체 구조입니다."
+            "f": "단위체가 인산·당·염기로 이루어진 뉴클레오타이드라는 점이 핵산의 특징입니다."
           },
           {
             "t": "단당류가 반복 연결된다",
@@ -1403,9 +1410,9 @@ const frameworks = [
         "prompt": "",
         "opts": [
           {
-            "t": "균질기로 곱게 갈아 만든 세포 추출물을 원심분리기에 돌리면, 무겁고 큰 성분부터 먼저 가라앉고 가볍고 작은 성분은 나중에 가라앉는 원리로 소기관들이 단계별로 나뉜다",
+            "t": "세포 파쇄액을 원심분리기에 넣고 회전 속도와 시간을 달리하여 세포소기관을 크기와 밀도에 따라 분리한다",
             "c": true,
-            "f": "무겁고 큰 세포소기관부터 먼저, 가볍고 작은 것은 나중에 가라앉는 원리로 소기관을 분리하는 것이 세포분획법의 특징입니다."
+            "f": "원심분리를 통해 세포소기관을 크기와 밀도에 따라 분리하는 것은 세포분획법의 특징입니다."
           },
           {
             "t": "시료 표면을 금속으로 코팅해 입체적인 표면 영상을 얻는다",
@@ -1670,9 +1677,9 @@ const frameworks = [
         "prompt": "",
         "opts": [
           {
-            "t": "조류(藻類)나 식물에 14C로 표지한 이산화 탄소를 흡수시킨 뒤, 이 방사성 탄소가 어떤 중간 산물들을 거쳐 최종 물질에 도달하는지 시간차를 두고 추적한다",
+            "t": "방사성 동위원소로 표지된 이산화 탄소를 식물 세포에 공급해, 광합성으로 포도당이 합성되는 경로를 추적한다",
             "c": true,
-            "f": "방사성 동위원소로 표지한 물질이 시간에 따라 어떤 화합물을 거쳐 이동하는지 추적하는 것은 자기방사법의 사례입니다(캘빈의 광합성 경로 규명 실험 등)."
+            "f": "방사성 동위원소를 추적해 물질대사 경로를 알아내는 것은 자기방사법의 사례입니다."
           },
           {
             "t": "세포 파쇄액을 원심분리기에 넣고 회전시켜 세포소기관을 크기·밀도별로 분리한다",
@@ -1802,10 +1809,10 @@ function updateDiffDisplay(){
   const v = parseInt(slider.value, 10);
   const pct = ((v - 5) / (30 - 5)) * 100;
   let color, label;
-  if(v <= 10){ color = '#C4453E'; label = '빠른 판단 연습'; }
-  else if(v <= 20){ color = '#E0A64A'; label = '표준 속도'; }
-  else { color = '#4CAF6E'; label = '여유롭게 생각하기'; }
-  slider.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #3A4530 ${pct}%, #3A4530 100%)`;
+  if(v <= 10){ color = '#FF6B6B'; label = '빠른 판단 연습'; }
+  else if(v <= 20){ color = '#F2A65A'; label = '표준 속도'; }
+  else { color = '#4FD1B8'; label = '여유롭게 생각하기'; }
+  slider.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #30405A ${pct}%, #30405A 100%)`;
   const valueEl = document.getElementById('diffValue');
   valueEl.textContent = v + '초';
   valueEl.style.color = color;
