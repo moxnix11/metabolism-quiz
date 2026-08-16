@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="물질대사">
+<meta name="apple-mobile-web-app-title" content="세포와 물질대사">
 <style>
   :root{
     --bg:#0A0B0E;
@@ -46,6 +46,53 @@
   header{
     margin-bottom:40px;
   }
+  .header-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+  }
+  .header-text{
+    flex:1;
+    min-width:0;
+  }
+  .logo-link{
+    flex-shrink:0;
+    display:block;
+    border-radius:50%;
+    transition:transform 0.2s ease;
+  }
+  .logo-link img{
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    display:block;
+  }
+  .logo-link:hover{
+    transform:scale(1.06);
+  }
+  .logo-link:focus-visible{
+    outline:2px solid var(--ink);
+    outline-offset:3px;
+    border-radius:50%;
+  }
+  .logo-wrap{
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+  }
+  .tap-hint{
+    font-size:14px;
+    line-height:1;
+    opacity:0.55;
+    animation:tapBounce 1.6s ease-in-out infinite;
+  }
+  @keyframes tapBounce{
+    0%, 100%{transform:translateY(0);}
+    50%{transform:translateY(-3px);}
+  }
   .eyebrow{
     font-family:'IBM Plex Mono',monospace;
     font-size:0.72rem;
@@ -59,15 +106,14 @@
     font-weight:700;
     line-height:1.28;
     letter-spacing:-0.01em;
-    margin:0 0 14px;
+    margin:0;
     word-break:keep-all;
   }
   .lede{
     font-size:0.98rem;
     line-height:1.65;
     color:var(--muted);
-    margin:0;
-    max-width:46ch;
+    margin:14px 0 0;
     word-break:keep-all;
   }
   .list{
@@ -176,6 +222,10 @@
   }
   @media (max-width:520px){
     .wrap{padding:48px 16px 40px;}
+    .header-row{flex-direction:column; align-items:flex-start; gap:10px;}
+    .header-text{order:2;}
+    .logo-wrap{order:1;}
+    .logo-link img{width:48px; height:48px;}
     .row{gap:12px; padding:18px 4px;}
     .desc{display:none;}
     .num{min-width:28px; font-size:0.95rem;}
@@ -183,6 +233,7 @@
   @media (prefers-reduced-motion:reduce){
     .row{animation:none; opacity:1;}
     .row, .num, .arrow{transition:none;}
+    .tap-hint{animation:none;}
   }
 
   .install-banner{
@@ -243,9 +294,19 @@
 <div class="spectrum"></div>
 <div class="wrap">
   <header>
-    <p class="eyebrow">사고훈련 시리즈</p>
-    <h1>세포와 물질대사</h1>
-    <p class="lede">세포를 이루는 물질부터 에너지를 얻고 만드는 과정까지, 여섯 단원을 순서대로 따라가며 사고훈련을 시작하세요.</p>
+    <div class="header-row">
+      <div class="header-text">
+        <p class="eyebrow">사고훈련 시리즈</p>
+        <h1>세포와 물질대사</h1>
+      </div>
+      <div class="logo-wrap">
+        <a class="logo-link" href="https://www.instagram.com/mjkim56272/" target="_blank" rel="noopener noreferrer">
+          <img src="logo.png" width="64" height="64" alt="B급 민재샘 인스타그램">
+        </a>
+        <span class="tap-hint" aria-hidden="true">👆</span>
+      </div>
+    </div>
+    <p class="lede">세포를 이루는 물질부터<br>에너지를 얻고 변환하는 과정까지,<br>여섯 단원을 순서대로 따라가며<br>사고훈련을 시작하세요.</p>
   </header>
 
   <nav class="list">
