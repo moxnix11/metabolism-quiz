@@ -46,15 +46,19 @@
   header{
     margin-bottom:40px;
   }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.72rem;
+    font-weight:600;
+    letter-spacing:0.06em;
+    color:var(--muted);
+    margin:0 0 10px;
+  }
   .header-row{
     display:flex;
     justify-content:space-between;
-    align-items:flex-start;
+    align-items:center;
     gap:16px;
-  }
-  .header-text{
-    flex:1;
-    min-width:0;
   }
   .logo-link{
     flex-shrink:0;
@@ -94,15 +98,9 @@
     0%, 100%{transform:translateY(0);}
     50%{transform:translateY(-3px);}
   }
-  .eyebrow{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.72rem;
-    font-weight:600;
-    letter-spacing:0.06em;
-    color:var(--muted);
-    margin:0 0 14px;
-  }
   h1{
+    flex:1;
+    min-width:0;
     font-size:clamp(1.9rem, 6vw, 2.5rem);
     font-weight:700;
     line-height:1.28;
@@ -292,11 +290,9 @@
 <div class="spectrum"></div>
 <div class="wrap">
   <header>
+    <p class="eyebrow">사고훈련 시리즈</p>
     <div class="header-row">
-      <div class="header-text">
-        <p class="eyebrow">사고훈련 시리즈</p>
-        <h1>세포와 물질대사</h1>
-      </div>
+      <h1>세포와 물질대사</h1>
       <div class="logo-wrap">
         <a class="logo-link" href="https://www.instagram.com/mjkim56272/" target="_blank" rel="noopener noreferrer">
           <img src="logo.png" width="64" height="64" alt="B급 민재샘 인스타그램">
