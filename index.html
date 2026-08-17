@@ -88,15 +88,10 @@
     gap:4px;
   }
   .tap-hint{
-    font-size:14px;
-    line-height:1;
-    opacity:1;
-    filter:drop-shadow(0 0 4px rgba(244,196,48,0.8)) brightness(1.2);
-    animation:tapBounce 1.6s ease-in-out infinite;
-  }
-  @keyframes tapBounce{
-    0%, 100%{transform:translateY(0);}
-    50%{transform:translateY(-3px);}
+    width:auto;
+    height:22px;
+    display:block;
+    opacity:0.9;
   }
   h1{
     flex:1;
@@ -229,7 +224,6 @@
   @media (prefers-reduced-motion:reduce){
     .row{animation:none; opacity:1;}
     .row, .num, .arrow{transition:none;}
-    .tap-hint{animation:none;}
   }
 
   .install-banner{
@@ -297,7 +291,7 @@
         <a class="logo-link" href="https://www.instagram.com/mjkim56272/" target="_blank" rel="noopener noreferrer">
           <img src="logo.png" width="64" height="64" alt="B급 민재샘 인스타그램">
         </a>
-        <span class="tap-hint" aria-hidden="true">👆</span>
+        <img class="tap-hint" src="tap-hint.png" width="37" height="28" alt="" aria-hidden="true">
       </div>
     </div>
     <p class="lede">세포를 이루는 물질부터<br>에너지를 얻고 변환하는 과정까지,<br>여섯 단원을 순서대로 따라가며<br>사고훈련을 시작하세요.</p>
