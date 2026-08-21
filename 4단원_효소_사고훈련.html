@@ -6,13 +6,6 @@
 <title>효소의 작용과 조절 · 사고 훈련</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<meta name="theme-color" content="#E8C547">
-<link rel="manifest" href="manifest-4.json">
-<link rel="apple-touch-icon" href="icon-4-180.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="효소">
 <style>
   :root{
     --bg:#14121F;
@@ -203,75 +196,12 @@
   .statcell{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 4px;text-align:center;}
   .statcell .n{font-family:'IBM Plex Mono',monospace;font-size:0.95rem;font-weight:600;color:var(--good);}
   .statcell .l{font-size:0.62rem;color:var(--muted);margin-top:3px;line-height:1.3;word-break:keep-all;padding:0 2px;}
-
-  .install-banner{
-    position:fixed; left:12px; right:12px; bottom:12px;
-    max-width:520px; margin:0 auto;
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:12px 14px;
-    display:flex; align-items:center; gap:10px;
-    box-shadow:0 8px 24px rgba(0,0,0,0.35);
-    z-index:50;
-    transition:transform 0.25s ease, opacity 0.25s ease;
-  }
-  .install-banner.hidden{
-    transform:translateY(140%);
-    opacity:0;
-    pointer-events:none;
-  }
-  .install-banner-text{
-    flex:1;
-    font-size:0.82rem;
-    color:var(--ink);
-    line-height:1.45;
-    word-break:keep-all;
-  }
-  .install-banner-btn{
-    background:var(--point);
-    color:var(--bg);
-    border:none;
-    border-radius:8px;
-    padding:8px 14px;
-    font-weight:700;
-    font-size:0.82rem;
-    cursor:pointer;
-    font-family:inherit;
-    flex-shrink:0;
-    white-space:nowrap;
-  }
-  .install-banner-dismiss{
-    background:none;
-    border:none;
-    color:var(--muted);
-    font-size:1rem;
-    cursor:pointer;
-    padding:4px;
-    flex-shrink:0;
-    line-height:1;
-  }
-
-  .homelink{
-    background:none; border:none; color:var(--muted);
-    font-size:0.85rem; margin-bottom:16px; font-family:inherit;
-    text-decoration:none; display:inline-flex; align-items:center; gap:4px;
-  }
-  .homelink:hover{ color:var(--point); }
 </style>
 </head>
 <body>
-<div id="installBanner" class="install-banner hidden">
-  <span class="install-banner-text">📲 홈 화면에 추가하고 앱처럼 써보세요</span>
-  <button id="installBtn" class="install-banner-btn">설치</button>
-  <button id="installDismiss" class="install-banner-dismiss" aria-label="닫기">✕</button>
-</div>
-
 <div class="wrap">
   <h1>효소의 작용과 조절 — 사고 훈련</h1>
   <p class="sub">효소가 반응 속도를 조절하는 원리를, 조건에 따라 달라지는 활성과 함께 단계별로 따라가며 익히는 연습이에요.</p>
-
-  <a class="homelink" href="index.html">&larr; 전체 단원</a>
 
   <div class="tabs" id="tabBar"></div>
 
@@ -907,12 +837,12 @@ function confirmDifficulty(){
 
 function itemTopic(item){
   // 문항이 다루는 '소재'를 정답 카테고리(정방향) 또는 target 라벨(역방향)에서 추출
-  if(item.dir === 'fwd'){
-    const correct = item.opts.find(o=>o.c);
-    return correct ? correct.t : 'unknown';
-  }
-  const m = item.label.match(/<span class="target">(.*?)<\/span>/);
-  return m ? m[1] : item.label;
+  // 끝에 붙은 괄호 병기(예: "투과 전자 현미경(TEM)")는 소재 식별에서 무시하여
+  // 같은 소재의 다른 표기 문항이 한 회차에 중복 출제되지 않도록 정규화한다.
+  const raw = item.dir === 'fwd'
+    ? ((item.opts.find(o=>o.c) || {}).t || 'unknown')
+    : ((item.label.match(/<span class="target">(.*?)<\/span>/) || [])[1] || item.label);
+  return raw.replace(/\([^)]*\)\s*$/, '').trim();
 }
 
 function pickBalancedRound(base, id, size){
@@ -930,36 +860,42 @@ function pickBalancedRound(base, id, size){
   });
   Object.values(byTopic).forEach(g => { g.fwd = shuffle(g.fwd); g.rev = shuffle(g.rev); });
 
-  let topics = shuffle(Object.keys(byTopic));
-  const chosen = [];
-  let fwdCount = 0, revCount = 0;
+  // 소재를 세 부류로 나눈다: 정방향만 있는 소재 / 역방향만 있는 소재 / 둘 다 있는 소재.
+  // 목표 정방향·역방향 개수를 "전용 소재" 먼저, 부족하면 "양방향 소재"로 채워
+  // 회차별 방향 균형(예: 7개 중 4:3)을 최대한 정확히 맞춘다(소재 중복 없이).
+  const topics = Object.keys(byTopic);
+  const fwdOnly = shuffle(topics.filter(t => byTopic[t].fwd.length && !byTopic[t].rev.length));
+  const revOnly = shuffle(topics.filter(t => byTopic[t].rev.length && !byTopic[t].fwd.length));
+  const both    = shuffle(topics.filter(t => byTopic[t].fwd.length && byTopic[t].rev.length));
+
   const targetFwd = Math.ceil(size / 2);
-  let ti = 0, guard = 0;
+  const targetRev = size - targetFwd;
+  const used = new Set();
+  const chosen = [];
 
-  while(chosen.length < size && guard < 1000){
-    guard++;
-    if(ti >= topics.length){
-      // 모든 소재를 한 바퀴 돌았는데 아직 부족하면(주제 수가 출제 수보다 적을 때) 남은 소재로 다시 순회
-      topics = shuffle(topics.filter(t => byTopic[t].fwd.length + byTopic[t].rev.length > 0));
-      ti = 0;
-      if(topics.length === 0) break;
-    }
-    const g = byTopic[topics[ti]];
-    const wantFwd = fwdCount < targetFwd;
-    let pickedIdx = null;
-    if(wantFwd && g.fwd.length) pickedIdx = g.fwd.shift();
-    else if(!wantFwd && g.rev.length) pickedIdx = g.rev.shift();
-    else if(g.fwd.length) pickedIdx = g.fwd.shift();
-    else if(g.rev.length) pickedIdx = g.rev.shift();
+  // 1) 정방향 목표 채우기: 정방향 전용 소재 → 부족하면 양방향 소재(정방향 쪽)
+  let need = targetFwd;
+  for(const t of fwdOnly){ if(need<=0) break; chosen.push(byTopic[t].fwd[0]); used.add(t); need--; }
+  for(const t of both){ if(need<=0) break; if(used.has(t)) continue; chosen.push(byTopic[t].fwd[0]); used.add(t); need--; }
 
-    if(pickedIdx !== null){
-      chosen.push(pickedIdx);
-      if(base.items[pickedIdx].dir === 'fwd') fwdCount++; else revCount++;
+  // 2) 역방향 목표 채우기: 역방향 전용 소재 → 부족하면 양방향 소재(역방향 쪽, 이미 쓴 소재 제외)
+  need = targetRev;
+  for(const t of revOnly){ if(need<=0) break; chosen.push(byTopic[t].rev[0]); used.add(t); need--; }
+  for(const t of both){ if(need<=0) break; if(used.has(t)) continue; chosen.push(byTopic[t].rev[0]); used.add(t); need--; }
+
+  // 3) 그래도 부족하면(소재 자체가 목표치보다 적을 때) 남은 소재로 채운다
+  if(chosen.length < size){
+    const leftover = shuffle(topics.filter(t=>!used.has(t)));
+    for(const t of leftover){
+      if(chosen.length>=size) break;
+      const g = byTopic[t];
+      const dir = g.fwd.length ? 'fwd' : 'rev';
+      chosen.push(g[dir][0]);
+      used.add(t);
     }
-    ti++;
   }
 
-  const chosenIdx = shuffle(chosen);
+  const chosenIdx = shuffle(chosen.slice(0, size));
   lastRoundIndices[id] = chosenIdx.slice();
   return chosenIdx.map(i => base.items[i]);
 }
@@ -1194,74 +1130,6 @@ function renderStats(){
 renderTabs();
 renderStats();
 updateMuteBtn();
-</script>
-<script>
-(function(){
-  var STORAGE_KEY = 'installDismissed_U4';
-  var banner = document.getElementById('installBanner');
-  var btn = document.getElementById('installBtn');
-  var dismissBtn = document.getElementById('installDismiss');
-  var textEl = banner ? banner.querySelector('.install-banner-text') : null;
-  var deferredPrompt = null;
-
-  function isStandalone(){
-    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-  }
-  function isIOS(){
-    return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
-  }
-  function dismissed(){
-    return localStorage.getItem(STORAGE_KEY) === '1';
-  }
-  function showBanner(){
-    if(!banner || isStandalone() || dismissed()) return;
-    banner.classList.remove('hidden');
-  }
-  function hideBanner(){
-    if(banner) banner.classList.add('hidden');
-  }
-
-  if('serviceWorker' in navigator){
-    window.addEventListener('load', function(){
-      navigator.serviceWorker.register('./sw.js').catch(function(){});
-    });
-  }
-
-  if(!isStandalone()){
-    if(isIOS()){
-      if(textEl) textEl.textContent = 'Safari 하단 공유 버튼 → "홈 화면에 추가"로 앱처럼 설치할 수 있어요';
-      if(btn) btn.style.display = 'none';
-      showBanner();
-    } else {
-      window.addEventListener('beforeinstallprompt', function(e){
-        e.preventDefault();
-        deferredPrompt = e;
-        showBanner();
-      });
-      window.addEventListener('appinstalled', function(){
-        hideBanner();
-        localStorage.setItem(STORAGE_KEY, '1');
-      });
-    }
-  }
-
-  if(btn){
-    btn.onclick = function(){
-      if(!deferredPrompt) return;
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.finally(function(){
-        deferredPrompt = null;
-        hideBanner();
-      });
-    };
-  }
-  if(dismissBtn){
-    dismissBtn.onclick = function(){
-      hideBanner();
-      localStorage.setItem(STORAGE_KEY, '1');
-    };
-  }
-})();
 </script>
 </body>
 </html>
